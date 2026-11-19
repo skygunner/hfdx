@@ -1,0 +1,26 @@
+import { Palette } from "std-widgets.slint";
+
+export global Tokens {
+    out property <length> small: 4px;
+    out property <length> gap: 8px;
+    out property <length> section: 16px;
+    out property <length> control: 32px;
+    out property <length> filter-height: 72px;
+    out property <length> detail-height: 96px;
+    out property <length> label-width: 160px;
+    out property <length> body: 14px;
+    out property <length> heading: 18px;
+    out property <brush> surface: Palette.background;
+    out property <brush> ink: Palette.foreground;
+    property <color> surface-color: Palette.background;
+    property <bool> dark: surface-color.red + surface-color.green + surface-color.blue < 384;
+    // Semantic text colors use the resolved palette, including the system theme.
+    public pure function status-color(tone: int) -> brush {
+        if tone == 1 { return dark ? #78b8ff : #175db6; }
+        if tone == 2 { return dark ? #c4a1ff : #7540b5; }
+        if tone == 3 { return dark ? #72d699 : #19733e; }
+        if tone == 4 { return dark ? #f2c46d : #895900; }
+        if tone == 5 { return dark ? #ff9393 : #b52e37; }
+        return Palette.foreground;
+    }
+}

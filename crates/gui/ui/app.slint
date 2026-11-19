@@ -1,0 +1,716 @@
+import { AboutSlint, Button, ComboBox, ListView, HorizontalBox, LineEdit, ScrollView, SpinBox, VerticalBox, CheckBox, ProgressIndicator, TextEdit, Palette } from "std-widgets.slint";
+import { Tokens } from "tokens.slint";
+import { HelpButton, HelpField } from "icons.slint";
+import { FileRow, FilesPane, DestinationPane } from "files.slint";
+import { SettingsPane } from "settings.slint";
+export { FileRow }
+export struct ProfileRow { index: int, label: string, selected: bool, partial: bool, complete: bool }
+export struct TaskRow { index: int, path: string, status: string, status-tone: int, verification-tone: int, acquired: string, size: string, speed: string, verification: string, error: string }
+export struct QueueRow { index: int, kind: int, expanded: bool, label: string, status: string, status-tone: int, verification-tone: int, progress: string, verification: string }
+export struct ConflictRow { path: string, local: string, remote: string }
+export struct RecentRow { path: string, status: string }
+
+export component AppWindow inherits Window {
+    title: "HFDX";
+    preferred-width: 1040px;
+    preferred-height: 760px;
+    min-width: 800px;
+    min-height: 600px;
+    background: Tokens.surface;
+    default-font-size: Tokens.body;
+    forward-focus: workspace;
+
+    property <length> task-progress-width: 300px;
+    in property <int> task-tone;
+    in property <string> build-info;
+    in property <[ProfileRow]> profiles;
+    in-out property <string> profile-filter;
+    in-out property <bool> profiles-expanded: true;
+    callback profile-toggle(int, bool);
+    in-out property <bool> tasks-open;
+    in-out property <bool> starting;
+    in-out property <bool> pausing;
+    in property <bool> queue-mode;
+    in-out property <int> queue-control-wait;
+    in property <bool> queue-preparing;
+    in property <bool> queue-cancellable;
+    in property <string> queue-summary;
+    in property <string> queue-note;
+    in property <string> queue-append-policy;
+    in property <string> queue-preparation;
+    in property <[QueueRow]> queue-rows;
+    in-out property <string> queue-details;
+    in property <bool> conflict-open;
+    in-out property <string> conflict-key;
+    in-out property <int> conflict-policy: -1;
+    in property <string> conflict-summary;
+    in property <[ConflictRow]> conflict-rows;
+    callback queue-inspect(int);
+    callback pause-all;
+    callback resume-all;
+    callback append-current;
+    callback remove-task(bool);
+    callback open-logs;
+    in property <bool> can-remove-task;
+    in-out property <string> remove-confirmation-id;
+    in property <string> task-error-details;
+    in-out property <bool> error-details-open;
+    callback confirm-conflicts(int);
+    callback cancel-submission;
+    in-out property <string> task-filter;
+    in-out property <int> task-status-filter;
+    in property <[TaskRow]> task-rows;
+    in property <string> task-counts;
+    in-out property <string> task-file-details;
+    in-out property <int> task-file-index: -1;
+    callback task-inspect(int);
+    in-out property <string> repository;
+    in-out property <int> repository-kind;
+    in-out property <string> endpoint;
+    in-out property <string> revision: "main";
+    in-out property <string> token;
+    in-out property <string> hf-token;
+    in-out property <string> modelscope-token;
+    in property <string> token-notice;
+    in property <string> token-help;
+    callback get-token(bool);
+    callback save-tokens;
+    in-out property <bool> saving-tokens;
+    in-out property <string> token-save-status;
+    in-out property <string> proxy;
+    in-out property <bool> allow-http;
+    in-out property <int> connections: 4;
+    in-out property <int> concurrent-files: 5;
+    in-out property <bool> verify: true;
+    in-out property <int> task-connections: 4;
+    in-out property <int> task-concurrent-files: 5;
+    in-out property <bool> task-verify: true;
+    in-out property <bool> notify: true;
+    in-out property <bool> sound;
+    in-out property <bool> debug;
+    in-out property <int> language-index;
+    in-out property <int> theme-index;
+    in property <string> log-directory;
+    in property <string> diagnostics-status;
+    changed theme-index => { Palette.color-scheme = root.theme-index == 1 ? ColorScheme.light : root.theme-index == 2 ? ColorScheme.dark : ColorScheme.unknown; }
+    in-out property <string> filter;
+    in-out property <string> catalog-key;
+    in-out property <bool> selected-only;
+    in-out property <string> destination;
+    in-out property <string> details;
+    in-out property <string> task-file;
+    in property <[FileRow]> rows;
+    in property <[RecentRow]> recent;
+    in property <[string]> directories;
+    in property <string> status: @tr("Starting task core...");
+    in property <string> error;
+    in property <string> summary;
+    in property <string> catalog-status;
+    in property <string> catalog-summary;
+    in property <string> options-summary;
+    in property <string> start-reason;
+    in property <int> matching-count;
+    in property <int> selected-count;
+    in property <int> hidden-count;
+    in property <int> header-state;
+    in property <bool> ready;
+    in property <bool> loading;
+    in property <bool> can-start;
+    in property <bool> editable;
+    in property <bool> can-pause;
+    in property <bool> can-resume;
+    in property <bool> can-retry;
+    in property <bool> can-verify;
+    in property <bool> can-open-folder;
+    in property <string> verification-text;
+    in property <string> task-identity: @tr("No task open. Choose files or open a recent task.");
+    in property <string> task-destination;
+    in-out property <string> opened-task-id;
+    in property <string> progress-text;
+    in property <string> activity;
+    in property <float> progress;
+    in-out property <bool> help-open;
+    in-out property <bool> options-open;
+    in-out property <bool> settings-open;
+    in-out property <bool> history-open;
+    in-out property <bool> details-open;
+    callback refresh;
+    callback load;
+    callback cancel-load;
+    callback filter-edited(string);
+    callback selected-only-edited(bool);
+    callback selection-action(int);
+    callback toggle(int, bool);
+    callback inspect(int);
+    callback start;
+    callback browse;
+    callback pause;
+    callback resume;
+    callback retry;
+    callback verify-existing;
+    callback open-folder;
+    callback appearance-edited;
+    callback save;
+    callback apply-access;
+    callback open-task(string);
+    callback forget-task(string);
+    callback choose-directory(int);
+
+    property <bool> panel-open: root.help-open || root.settings-open || root.history-open;
+    property <string> current-options: !root.tasks-open
+        ? (root.queue-append-policy != "" ? root.queue-append-policy : (root.task-verify ? @tr("Verify after transfer") : @tr("Verification off for this download"))
+            + " · " + root.task-connections + " " + @tr("connections")
+            + " · " + (root.queue-mode ? root.concurrent-files : root.task-concurrent-files) + " " + @tr("files at once"))
+        : root.options-summary;
+    property <string> kind-help: @tr("A model repository stores a model and its configuration. A dataset repository stores training or evaluation data.");
+    property <string> repository-help: @tr("Paste a Hugging Face repository or ModelScope.ai model link. For author/name, choose the endpoint in Settings. This does not run a model.");
+    property <string> log-help: @tr("Select this path and copy it. Logs may contain local paths.");
+
+    function close-panels() {
+        root.help-open = false;
+        root.settings-open = false;
+        root.history-open = false;
+        root.options-open = false;
+    }
+
+    workspace := FocusScope {
+        key-pressed(event) => {
+            if event.text == Key.Escape && (root.panel-open || root.options-open) {
+                root.close-panels();
+                return accept;
+            }
+            return reject;
+        }
+
+        VerticalBox {
+            spacing: Tokens.gap;
+            padding: Tokens.section;
+            HorizontalLayout {
+                spacing: Tokens.gap;
+                alignment: center;
+                Text { text: "HFDX"; font-size: Tokens.heading; vertical-alignment: center; }
+                HelpButton {
+                    icon: @image-url("icons/list.svg");
+                    label: @tr("New download");
+                    help: @tr("Return to download setup. The current task and draft are kept.");
+                    checked: !root.tasks-open && !root.panel-open;
+                    clicked => {
+                        root.close-panels();
+                        root.tasks-open = false;
+                    }
+                }
+                Rectangle { horizontal-stretch: 1; }
+                HelpButton {
+                    icon: @image-url("icons/download.svg");
+                    label: @tr("Downloads");
+                    help: @tr("Show every task file, progress, verification and errors.");
+                    checked: root.tasks-open && !root.panel-open;
+                    enabled: root.queue-mode || root.starting || root.task-identity != "";
+                    clicked => { root.close-panels(); root.tasks-open = true; }
+                }
+
+                HelpButton {
+                    icon: @image-url("icons/history.svg");
+                    label: @tr("History");
+                    help: @tr("View and open an earlier task. Opening keeps it paused and does not start a download.");
+                    checked: root.history-open;
+                    clicked => { root.settings-open = false; root.help-open = false; root.tasks-open = false; root.history-open = true; }
+                }
+                HelpButton {
+                    icon: @image-url("icons/settings.svg");
+                    label: @tr("Settings");
+                    help: @tr("Change language, theme, and defaults for later tasks, plus notifications and logs.");
+                    checked: root.settings-open;
+                    clicked => { root.history-open = false; root.help-open = false; root.tasks-open = false; root.settings-open = true; }
+                }
+                HelpButton {
+                    icon: @image-url("icons/help.svg");
+                    label: @tr("Help");
+                    help: @tr("Open usage notes, the log directory, and About Slint.");
+                    checked: root.help-open;
+                    clicked => { root.history-open = false; root.settings-open = false; root.tasks-open = false; root.help-open = true; }
+                }
+            }
+            if !root.tasks-open && !root.panel-open: ScrollView {
+                vertical-stretch: 1;
+                VerticalBox {
+                    spacing: Tokens.gap;
+                    if root.conflict-open: VerticalBox {
+                        spacing: Tokens.gap;
+                        Text { text: @tr("Existing files have different content"); font-size: Tokens.heading; }
+                        Text { text: root.conflict-summary; wrap: word-wrap; }
+                        Text { text: @tr("Only these conflicting files need a decision. Other versions in this folder stay unchanged."); wrap: word-wrap; }
+                        ListView {
+                            height: 144px;
+                            for item in root.conflict-rows: VerticalBox {
+                                Text { text: item.path; overflow: elide; }
+                                Text { text: @tr("Local") + ": " + item.local; overflow: elide; }
+                                Text { text: @tr("Remote") + ": " + item.remote; overflow: elide; }
+                            }
+                        }
+                        HorizontalBox {
+                            HelpButton { label: @tr("Overwrite"); help: @tr("Replace only conflicting files with the selected remote version."); checked: root.conflict-policy == 0; clicked => { root.conflict-policy = 0; } }
+                            HelpButton { label: @tr("Only if remote is newer"); help: @tr("Compare remote file commit time with local modification time. Keep local when time is unavailable."); checked: root.conflict-policy == 1; clicked => { root.conflict-policy = 1; } }
+                            HelpButton { label: @tr("Archive then replace"); help: @tr("Move only conflicting old files into archive, preserving their paths."); checked: root.conflict-policy == 2; clicked => { root.conflict-policy = 2; } }
+                        }
+                        HorizontalBox {
+                            HelpButton { label: @tr("Confirm and add"); help: @tr("Apply this policy to this submission only."); enabled: root.conflict-policy >= 0 && !root.starting && !root.queue-preparing; primary: true; clicked => { root.confirm-conflicts(root.conflict-policy); } }
+                            HelpButton { label: @tr("Cancel submission"); help: @tr("Keep the draft and leave existing tasks and files unchanged."); clicked => { root.cancel-submission(); } }
+                        }
+                    }
+                    if root.queue-preparing: Text { text: root.queue-preparation; wrap: word-wrap; }
+                    if root.queue-cancellable: HelpButton { label: @tr("Cancel submission"); help: @tr("Keep the draft and leave existing tasks and files unchanged."); clicked => { root.cancel-submission(); } }
+                    Text { text: @tr("1 Choose a repository"); font-size: Tokens.heading; }
+                    HorizontalLayout {
+                        spacing: Tokens.gap;
+                        Rectangle {
+                            width: 155px;
+                            horizontal-stretch: 0;
+                            height: Tokens.control;
+                            kind := ComboBox {
+                                width: 100%;
+                                model: [@tr("Model repository"), @tr("Dataset repository")];
+                                current-index <=> root.repository-kind;
+                                enabled: root.editable;
+                                accessible-label: @tr("Repository kind");
+                                accessible-description: root.kind-help;
+                            }
+                            HelpField { help: root.kind-help; }
+                        }
+                        Rectangle {
+                            horizontal-stretch: 1;
+                            height: Tokens.control;
+                            repository-input := LineEdit {
+                                width: 100%;
+                                height: 100%;
+                                text <=> root.repository;
+                                enabled: root.editable;
+                                accessible-label: @tr("Repository");
+                                accessible-description: root.repository-help;
+                                placeholder-text: @tr("Paste a Hugging Face / ModelScope.ai link, or author/name");
+                                accepted => { if root.editable { root.load(); } }
+                            }
+                            HelpField { help: root.repository-help; editing: repository-input.has-focus; }
+                        }
+                        HelpButton {
+                            label: "?";
+                            help: root.repository-help;
+                            clicked => { root.tasks-open = false; root.help-open = true; }
+                        }
+                        HelpButton {
+                            icon: @image-url("icons/list.svg");
+                            label: root.ready ? @tr("Refresh list") : @tr("View files");
+                            help: @tr("Read file names and sizes. It does not download the model; checking files is available after the list loads.");
+                            primary: !root.can-start;
+                            enabled: root.editable && !root.loading;
+                            clicked => { root.load(); }
+                        }
+                        if root.loading: HelpButton {
+                            label: @tr("Cancel");
+                            help: @tr("Stop reading the file list. Closing the window also stops the current work and saves it.");
+                            enabled: true;
+                            clicked => { root.cancel-load(); }
+                        }
+                        if root.loading && !root.editable: Text {
+                            text: @tr("The repository stays locked while the file list is read. Cancel stops the read.");
+                            wrap: word-wrap;
+                            vertical-alignment: center;
+                        }
+                    }
+                    Text { text: @tr("This reads the file list only. It does not download or load the model."); wrap: word-wrap; }
+                    if root.token-notice != "": HorizontalBox {
+                        Text { text: root.token-notice; wrap: word-wrap; horizontal-stretch: 1; }
+                        Button { text: @tr("Set up tokens"); clicked => { root.settings-open = true; } }
+                    }
+                    Text { text: root.catalog-summary; wrap: word-wrap; }
+                    Text { text: root.queue-mode ? root.catalog-status : root.status; wrap: word-wrap; }
+                    if root.error != "": HorizontalLayout {
+                        spacing: Tokens.gap;
+                        Text { text: root.error; wrap: word-wrap; horizontal-stretch: 1; accessible-label: root.error; }
+                        Button { height: Tokens.control; vertical-stretch: 0; text: @tr("Open settings"); clicked => { root.settings-open = true; } }
+                    }
+                    Text { text: @tr("2 Choose files"); font-size: Tokens.heading; }
+                    if root.profiles.length > 0: VerticalBox {
+                        HorizontalBox {
+                            Text { text: @tr("Download combinations (multiple selection)"); horizontal-stretch: 1; }
+                            Button { height: Tokens.control; vertical-stretch: 0; text: root.profiles-expanded ? @tr("Preview final files") : @tr("Choose combinations"); clicked => { root.profiles-expanded = !root.profiles-expanded; root.filter = ""; root.filter-edited(""); root.selected-only = true; root.selected-only-edited(true); } }
+                        }
+                        if root.profiles-expanded: LineEdit { height: Tokens.control; vertical-stretch: 0; text <=> root.profile-filter; placeholder-text: @tr("Search combinations"); edited => { root.refresh(); } }
+                        if root.profiles-expanded: ListView {
+                            height: 120px;
+                                for item in root.profiles: CheckBox {
+                                    text: item.label + (item.partial ? @tr(" (custom selection)") : ""); checked: item.selected;
+                                    enabled: root.editable && item.complete;
+                                    toggled => { root.profile-toggle(item.index, self.checked); }
+                                }
+                        }
+                        Text { text: @tr("The checked files below are the final download list. Shared files count once. MTP and vision files are optional selections."); wrap: word-wrap; }
+                    }
+                    files := FilesPane {
+                        filter <=> root.filter;
+                        selected-only <=> root.selected-only;
+                        destination <=> root.destination;
+                        details <=> root.details;
+                        rows: root.rows;
+                        summary: root.summary;
+                        catalog-status: root.catalog-status;
+                        options-summary: root.current-options;
+                        start-reason: root.start-reason;
+                        matching-count: root.matching-count;
+                        selected-count: root.selected-count;
+                        hidden-count: root.hidden-count;
+                        header-state: root.header-state;
+                        ready: root.ready;
+                        loading: root.loading;
+                        can-start: root.can-start;
+                        enabled: root.editable;
+                        filter-edited(value) => { root.filter-edited(value); }
+                        selected-only-edited(value) => { root.selected-only-edited(value); }
+                        selection-action(value) => { root.selection-action(value); }
+                        toggle(index, checked) => { root.toggle(index, checked); }
+                        inspect(index) => { root.inspect(index); }
+                        start => { root.start(); }
+                        browse => { root.browse(); }
+                        choose-recent => { root.history-open = true; root.settings-open = false; }
+                        open-options => { root.options-open = !root.options-open; }
+                    }
+
+                }
+            }
+            if root.tasks-open && !root.panel-open: VerticalBox {
+                vertical-stretch: 1;
+                HorizontalBox {
+                    height: Tokens.control;
+                    vertical-stretch: 0;
+                    Text { text: @tr("Download task"); font-size: Tokens.heading; height: Tokens.control; vertical-alignment: center; horizontal-stretch: 1; }
+                    if root.queue-mode: Button { text: @tr("Delete task"); enabled: root.can-remove-task && root.opened-task-id != "" && root.remove-confirmation-id == ""; clicked => { root.remove-task(false); } }
+                    Button { height: Tokens.control; vertical-stretch: 0; text: @tr("Back to download setup"); clicked => { root.tasks-open = false; } }
+                }
+                if root.remove-confirmation-id != "": VerticalBox {
+                    Text { text: @tr("Remove this task from the queue? Its download will stop. Downloaded files and resume data are kept."); wrap: word-wrap; }
+                    HorizontalBox {
+                        alignment: LayoutAlignment.start;
+                        Button { text: @tr("Confirm deletion"); clicked => { root.remove-task(true); } }
+                        Button { text: @tr("Cancel"); clicked => { root.remove-confirmation-id = ""; } }
+                    }
+                }
+                if root.starting: VerticalBox {
+                    vertical-stretch: 1;
+                    alignment: LayoutAlignment.start;
+                    spacing: Tokens.gap;
+                    Text { text: root.queue-mode ? root.queue-preparation : @tr("Initializing download task. Connecting to the download engine…"); wrap: word-wrap; }
+                    Text { text: @tr("Please wait. You can switch pages while the task is prepared."); wrap: word-wrap; }
+                    if root.queue-cancellable: HelpButton { label: @tr("Cancel submission"); help: @tr("Keep the draft and leave existing tasks and files unchanged."); clicked => { root.cancel-submission(); } }
+                }
+                if root.queue-mode: HorizontalBox {
+                    Text { text: root.queue-summary; horizontal-stretch: 1; wrap: word-wrap; }
+                    HelpButton { label: root.queue-control-wait == 1 ? @tr("Pausing all…") : @tr("Pause all"); enabled: root.queue-control-wait == 0; help: @tr("Pause all downloads and verification, keeping progress."); clicked => { root.pause-all(); } }
+                    HelpButton { label: root.queue-control-wait == 2 ? @tr("Continuing queue…") : @tr("Continue queue"); enabled: root.queue-control-wait == 0; help: @tr("Explicitly resume paused items in the queue."); clicked => { root.resume-all(); } }
+                    HelpButton { label: @tr("Add files to this version"); help: @tr("Prepare more files from this item's fixed commit and destination."); enabled: root.opened-task-id != ""; clicked => { root.append-current(); } }
+                }
+                if root.queue-mode && root.queue-note != "": Text {text:root.queue-note;wrap:word-wrap;}
+                if !root.starting: VerticalBox {
+                    vertical-stretch: 1;
+                Text { text: root.task-identity; overflow: elide; }
+                if !root.queue-mode: Text { text: root.task-destination; overflow: elide; }
+                Text { text: root.pausing ? @tr("Pausing…") : root.status; color: Tokens.status-color(root.pausing ? 0 : root.task-tone); wrap: word-wrap; }
+                if root.error != "": Text { text: root.error; color: Tokens.status-color(5); wrap: word-wrap; }
+                if root.task-error-details != "": HorizontalBox {
+                    alignment: LayoutAlignment.start;
+                    Button { text: root.error-details-open ? @tr("Hide error details") : @tr("View error details"); clicked => { root.error-details-open = !root.error-details-open; } }
+                    if root.error-details-open: Button { text: @tr("Open log folder"); enabled: root.log-directory != ""; clicked => { root.open-logs(); } }
+                }
+                if root.error-details-open && root.task-error-details != "": TextEdit { text: root.task-error-details; read-only: true; height: 80px; accessible-label: @tr("Error details"); }
+                if root.diagnostics-status != "": Text { text: root.diagnostics-status; wrap: word-wrap; }
+                if !root.queue-mode: Text { text: root.progress-text; wrap: word-wrap; }
+                if !root.queue-mode: ProgressIndicator { progress: root.progress; }
+                if !root.queue-mode: Text { text: root.verification-text; wrap: word-wrap; }
+                        HorizontalLayout {
+                            spacing: Tokens.gap;
+                            HelpButton {
+                                icon: @image-url("icons/pause.svg");
+                                label: root.pausing ? @tr("Pausing…") : @tr("Pause");
+                                help: @tr("Pause the current transfer or verification and keep its progress.");
+                                enabled: root.can-pause;
+                                clicked => { root.pause(); }
+                            }
+                            HelpButton {
+                                icon: @image-url("icons/play.svg");
+                                label: @tr("Resume");
+                                help: @tr("Continue the unfinished download or verification.");
+                                enabled: root.can-resume;
+                                clicked => { root.resume(); }
+                            }
+                            HelpButton {
+                                label: @tr("Retry failed");
+                                help: @tr("Download only the owned files that failed, then verify them again.");
+                                enabled: root.can-retry;
+                                clicked => { root.retry(); }
+                            }
+                            HelpButton {
+                                label: @tr("Verify existing files");
+                                help: @tr("Check files already downloaded. Opening a task never starts this automatically.");
+                                enabled: root.can-verify;
+                                clicked => { root.verify-existing(); }
+                            }
+                            HelpButton {
+                                icon: @image-url("icons/folder.svg");
+                                label: @tr("Open download folder");
+                                help: @tr("Open the destination in the system file manager. It does not run downloaded files.");
+                                enabled: root.can-open-folder;
+                                clicked => { root.open-folder(); }
+                            }
+                        }
+
+                HorizontalBox {
+                    LineEdit { height: Tokens.control; vertical-stretch: 0; text <=> root.task-filter; placeholder-text: @tr("Search task files"); edited => { root.refresh(); } horizontal-stretch: 1; }
+                    ComboBox { width: 155px; horizontal-stretch: 0; model: [@tr("All files"), @tr("Downloading"), @tr("Waiting"), @tr("Downloaded"), @tr("Failed"), @tr("Verifying"), @tr("Already present"), @tr("Kept local"), @tr("Could not check")]; current-index <=> root.task-status-filter; selected(_) => { root.refresh(); } }
+                }
+                if !root.queue-mode: Text { text: root.task-counts; wrap: word-wrap; }
+                HorizontalLayout {
+                    Text { text: @tr("File"); horizontal-stretch: 1; }
+                    Text { text: @tr("Status"); width: 100px; }
+                    Text { text: @tr("Progress / speed"); width: root.task-progress-width; }
+                    Text { text: @tr("Verification"); width: 105px; }
+                }
+                if !root.queue-mode: ListView {
+                    vertical-stretch: 1;
+                    min-height: 80px;
+                    for row in root.task-rows: Rectangle {
+                        height: 44px;
+                        background: root.task-file-index == row.index ? #4488cc33 : transparent;
+                        HorizontalLayout {
+                            Text { text: row.path; horizontal-stretch: 1; vertical-alignment: center; overflow: elide; }
+                            Text { text: row.status; color: Tokens.status-color(row.status-tone); width: 100px; vertical-alignment: center; overflow: elide; }
+                            Text { text: row.acquired + " / " + row.size + "\n" + row.speed; width: root.task-progress-width; vertical-alignment: center; }
+                            Text { text: row.verification; color: Tokens.status-color(row.verification-tone); width: 105px; vertical-alignment: center; overflow: elide; }
+                        }
+                        TouchArea { clicked => { root.task-inspect(row.index); } }
+                        accessible-role: button;
+                        accessible-label: row.path + " " + row.status + " " + row.error;
+                    }
+                }
+                if root.queue-mode: ListView {
+                    vertical-stretch: 1;
+                    min-height: 120px;
+                    for row in root.queue-rows: queue-row := FocusScope {
+                        height: row.kind == 0 ? 26px : 30px;
+                        accessible-role: button;
+                        accessible-label: row.label;
+                        accessible-description: row.status + " " + row.progress + " " + row.verification;
+                        accessible-action-default => { root.queue-inspect(row.index); }
+                        key-pressed(event) => {
+                            if event.text == Key.Return || event.text == Key.Space {
+                                root.queue-inspect(row.index);
+                                return accept;
+                            }
+                            return reject;
+                        }
+                        Rectangle {
+                            width: 100%; height: 100%;
+                            background: row-touch.has-hover || queue-row.has-focus ? #80808020 : transparent;
+                            border-width: queue-row.has-focus ? 1px : 0px;
+                            border-color: Tokens.ink;
+                            HorizontalLayout {
+                                padding-left: row.kind == 0 ? 18px : 0px;
+                                spacing: Tokens.gap;
+                                Text { text: row.kind == 0 ? "" : row.expanded ? "▾" : "▸"; width: 16px; vertical-alignment: center; }
+                                Text { text: row.label; horizontal-stretch: 1; font-weight: row.kind == 0 ? 400 : 600; vertical-alignment: center; overflow: elide; }
+                                Text { text: row.status; color: Tokens.status-color(row.status-tone); width: 100px; vertical-alignment: center; overflow: elide; }
+                                Text { text: row.progress; width: root.task-progress-width; vertical-alignment: center; overflow: elide; }
+                                Text { text: row.verification; color: Tokens.status-color(row.verification-tone); width: 105px; vertical-alignment: center; overflow: elide; }
+                            }
+                            row-touch := TouchArea { clicked => { queue-row.focus(); root.queue-inspect(row.index); } }
+                        }
+                    }
+                }
+                if root.queue-mode: TextEdit { text: root.queue-details; read-only: true; height: 48px; accessible-label: @tr("Queue file details"); }
+                if !root.queue-mode: TextEdit { text: root.task-file-details == "" ? @tr("Select a file to view its full path and error.") : root.task-file-details; read-only: true; height: 48px; accessible-label: @tr("Selected file details"); }                }
+
+            }
+            if root.panel-open: VerticalBox {
+                vertical-stretch: 1;
+                Text { text: root.history-open ? @tr("History") : root.settings-open ? @tr("Settings") : @tr("Help"); font-size: Tokens.heading; }
+
+                padding: Tokens.gap;
+                if root.help-open: ScrollView {
+                    vertical-stretch: 1;
+                    VerticalBox {
+                        spacing: Tokens.gap;
+                        Text { text: @tr("Enter a repository, view its file list, check files, choose a folder, then start the download."); wrap: word-wrap; }
+                        Text { text: @tr("Closing the window stops download and verification and saves the task. Switching tabs keeps the current task running."); wrap: word-wrap; }
+                        Text { text: @tr("Log directory"); }
+                        HorizontalLayout {
+                            spacing: Tokens.gap;
+                            log-path := LineEdit {
+                                height: Tokens.control;
+                                vertical-stretch: 0;
+                                horizontal-stretch: 1;
+                                text: root.log-directory;
+                                read-only: true;
+                                accessible-label: @tr("Log directory, select and copy");
+                                accessible-description: root.log-help;
+                            }
+                            Button { height: Tokens.control; vertical-stretch: 0;
+                                text: @tr("Copy path");
+                                enabled: root.log-directory != "";
+                                clicked => { log-path.select-all(); log-path.copy(); }
+                            }
+                        }
+                        Text { text: @tr("Use the tabs to switch between download setup, tasks, history, settings and help. Draft selections and the current task are kept."); wrap: word-wrap; }
+                        Text { text: @tr("Completed files are verified as slots become available. Downloads and verification share one concurrency limit."); wrap: word-wrap; }
+                        Text { text: @tr("HFDX version and build"); font-size: Tokens.heading; }
+                        TextEdit { text: root.build-info; read-only: true; height: 88px; vertical-stretch: 0; accessible-label: @tr("HFDX version and build"); }
+                        AboutSlint { width: 280px; height: 112px; }
+                    }
+                }
+                if root.settings-open: SettingsPane {
+                    vertical-stretch: 1;
+                    endpoint <=> root.endpoint;
+                    revision <=> root.revision;
+                    token <=> root.token;
+                    hf-token <=> root.hf-token;
+                    modelscope-token <=> root.modelscope-token;
+                    token-help: root.token-help;
+                    get-token(modelscope) => { root.get-token(modelscope); }
+                    save-tokens => { root.save-tokens(); }
+                    tokens-edited => { root.token-save-status = ""; }
+                    saving-tokens: root.saving-tokens;
+                    token-save-status: root.token-save-status;
+                    proxy <=> root.proxy;
+                    allow-http <=> root.allow-http;
+                    connections <=> root.connections;
+                    concurrent-files <=> root.concurrent-files;
+                    verify <=> root.verify;
+                    notify <=> root.notify;
+                    sound <=> root.sound;
+                    debug <=> root.debug;
+                    language-index <=> root.language-index;
+                    theme-index <=> root.theme-index;
+                    log-directory: root.log-directory;
+                    diagnostics-status: root.diagnostics-status;
+                    appearance-edited => { root.appearance-edited(); }
+                    save => { root.save(); }
+                    apply-access => { root.apply-access(); }
+                    endpoint-edited => { root.token = ""; }
+                }
+                if root.history-open: VerticalBox {
+                    vertical-stretch: 1;
+                    Text { text: @tr("Recent destinations"); }
+                    ComboBox {
+                        model: root.directories;
+                        enabled: root.editable;
+                        selected(value) => { root.choose-directory(self.current-index); root.history-open = false; }
+                        accessible-label: @tr("Recent folders");
+                        accessible-description: @tr("Choose a destination used before.");
+                    }
+                    Text { text: @tr("Task record path (.hfdx/task.json)"); }
+                    LineEdit { height: Tokens.control; vertical-stretch: 0; text <=> root.task-file; accessible-label: @tr("Task record path"); }
+                    HelpButton {
+                        label: @tr("Open paused");
+                        help: @tr("Open the saved task paused. It does not resume automatically.");
+                        enabled: root.editable;
+                        clicked => { root.open-task(root.task-file); }
+                    }
+                    ScrollView {
+                        vertical-stretch: 1;
+                        VerticalBox {
+                            alignment: LayoutAlignment.start;
+                            for item in root.recent: VerticalBox {
+                                vertical-stretch: 0;
+                                Text { text: item.path; wrap: word-wrap; }
+                                Text { text: item.status; wrap: word-wrap; }
+                                HorizontalLayout {
+                                    height: Tokens.control;
+                                    vertical-stretch: 0;
+                                    spacing: Tokens.gap;
+                                    Button { height: Tokens.control; vertical-stretch: 0; text: @tr("Open paused"); enabled: root.editable; clicked => { root.open-task(item.path); } }
+                                    HelpButton {
+                                        label: @tr("Forget record");
+                                        help: @tr("Remove this history entry. Downloaded files stay on disk.");
+                                        enabled: root.editable;
+                                        clicked => { root.forget-task(item.path); }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    Text { text: @tr("Opening a saved task keeps it paused. Switching tabs does not stop the current task."); wrap: word-wrap; }
+                }
+                HorizontalBox { alignment: LayoutAlignment.start; Button { height: Tokens.control; vertical-stretch: 0; text: @tr("Back to download setup"); horizontal-stretch: 0; clicked => { root.close-panels(); root.tasks-open = false; } } }
+            }
+            if !root.tasks-open && !root.panel-open: DestinationPane {
+                destination <=> root.destination;
+                can-start: root.can-start;
+                enqueue: root.queue-mode;
+                enabled: root.editable;
+                start-reason: root.start-reason;
+                options-summary: root.current-options;
+                summary: root.summary;
+                browse => { root.browse(); }
+                choose-recent => { root.history-open = true; }
+                open-options => { root.options-open = true; }
+                start => { root.start(); }
+            }
+        }
+    }
+
+
+    if root.options-open: Rectangle {
+        background: #00000066;
+        TouchArea { clicked => { } }
+        Rectangle {
+            background: Tokens.surface;
+            border-width: 1px;
+            y: parent.height - self.height - Tokens.section;
+            x: Tokens.section;
+            width: parent.width - 2 * Tokens.section;
+            height: min(280px, parent.height - 2 * Tokens.section);
+            forward-focus: options-close;
+            VerticalBox {
+                padding: Tokens.gap;
+                spacing: Tokens.gap;
+                Text { text: root.current-options; wrap: word-wrap; }
+                if !root.tasks-open: VerticalBox {
+                    spacing: Tokens.gap;
+                    Text { text: @tr("These values apply to new download items. Appended files keep the existing item's connections and verification policy."); wrap: word-wrap; }
+                    HorizontalLayout {
+                        spacing: Tokens.gap;
+                        Text { text: @tr("Connections per file"); vertical-alignment: center; }
+                        SpinBox {
+                            value <=> root.task-connections;
+                            minimum: 1;
+                            maximum: 10;
+                            enabled: root.editable && root.queue-append-policy == "";
+                            accessible-label: @tr("Connections per file for this download");
+                        }
+                        Text { text: @tr("Concurrent files"); vertical-alignment: center; }
+                        SpinBox {
+                            value <=> root.task-concurrent-files;
+                            minimum: 1;
+                            maximum: 10;
+                            enabled: root.editable && !root.queue-mode;
+                            accessible-label: @tr("Concurrent files for this download");
+                        }
+                    }
+                    if root.queue-mode: Text { text: @tr("The queue shares the global concurrency limit in Settings."); wrap: word-wrap; }
+                    CheckBox {
+                        text: @tr("Verify after this download");
+                        checked <=> root.task-verify;
+                        enabled: root.editable && root.queue-append-policy == "";
+                        accessible-description: @tr("Use repository checksums after transfer. A missing checksum is reported as not verified.");
+                    }
+                }
+                if root.opened-task-id != "": Text {
+                    text: @tr("This open task keeps the options it was created with. Change Settings to affect later tasks.");
+                    wrap: word-wrap;
+                }
+                HorizontalLayout {
+                    spacing: Tokens.gap;
+                    options-close := Button { height: Tokens.control; vertical-stretch: 0; text: @tr("Close"); clicked => { root.options-open = false; } }
+                    Button { height: Tokens.control; vertical-stretch: 0; text: @tr("Open settings"); clicked => { root.options-open = false; root.settings-open = true; } }
+                }
+            }
+        }
+    }
+}

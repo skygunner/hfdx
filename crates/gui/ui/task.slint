@@ -1,0 +1,34 @@
+import { Button, HorizontalBox, LineEdit, ProgressIndicator, TextEdit, VerticalBox } from "std-widgets.slint";
+import { Tokens } from "tokens.slint";
+
+export component TaskPane inherits VerticalBox {
+    in property <string> identity;
+    in property <string> destination;
+    in property <string> progress-text;
+    in property <string> activity;
+    in property <float> progress;
+    in property <bool> can-pause;
+    in property <bool> can-resume;
+    in property <bool> can-retry;
+    in property <bool> can-verify;
+    in property <string> verification-text;
+    callback verify-existing;
+    callback pause;
+    callback resume;
+    callback retry;
+    padding: Tokens.section;
+    spacing: Tokens.gap;
+    Text { text: root.identity; wrap: word-wrap; }
+    LineEdit { text: root.destination; read-only: true; accessible-label: @tr("Task destination, select and copy"); }
+    Text { text: root.progress-text; wrap: word-wrap; }
+    ProgressIndicator { progress: root.progress; }
+    Text { text: root.verification-text; wrap: word-wrap; }
+    HorizontalBox {
+        Button { text: @tr("Pause"); enabled: root.can-pause; clicked => { root.pause(); } }
+        Button { text: @tr("Resume"); primary: root.can-resume; enabled: root.can-resume; clicked => { root.resume(); } }
+        Button { text: @tr("Retry failed"); enabled: root.can-retry; clicked => { root.retry(); } }
+        Button { text: @tr("Verify existing files"); enabled: root.can-verify; clicked => { root.verify-existing(); } }
+    }
+    Text { text: @tr("Active and failed files"); font-size: Tokens.heading; }
+    TextEdit { text: root.activity; read-only: true; accessible-label: @tr("Active and failed files"); }
+}

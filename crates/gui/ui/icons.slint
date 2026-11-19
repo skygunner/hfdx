@@ -1,0 +1,45 @@
+import { Button, VerticalBox } from "std-widgets.slint";
+import { Tokens } from "tokens.slint";
+
+export component HelpButton inherits Rectangle {
+    in property <image> icon;
+    in property <string> label;
+    in property <string> help;
+    in property <bool> enabled: true;
+    in property <bool> primary;
+    in property <bool> checked;
+    callback clicked;
+    horizontal-stretch: 0;
+    vertical-stretch: 0;
+    in property <bool> stretch;
+    min-height: Tokens.control;
+    forward-focus: action;
+    property <bool> focused: action.has-focus;
+    accessible-role: none;
+
+    action := Button {
+        text: root.label;
+        icon: root.icon;
+        icon-size: 16px;
+        colorize-icon: true;
+        enabled: root.enabled;
+        primary: root.primary;
+        checked: root.checked;
+        accessible-label: root.label;
+        accessible-description: root.help;
+        clicked => { root.clicked(); }
+        Tooltip { text: @markdown("{root.help}"); }
+    }
+
+}
+
+// Tooltip observes pointer events without accepting clicks or taking focus.
+export component HelpField inherits Rectangle {
+    in property <string> help;
+    in property <bool> editing: true;
+    width: 100%; height: 100%;
+    if !root.editing: Rectangle {
+        width: 100%; height: 100%;
+        Tooltip { text: @markdown("{root.help}"); }
+    }
+}

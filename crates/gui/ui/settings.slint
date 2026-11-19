@@ -1,0 +1,146 @@
+import { Button, CheckBox, ComboBox, HorizontalBox, LineEdit, ScrollView, SpinBox, VerticalBox } from "std-widgets.slint";
+import { Tokens } from "tokens.slint";
+
+export component SettingsPane inherits VerticalBox {
+    in-out property <string> endpoint;
+    in-out property <string> revision: "main";
+    in-out property <string> token;
+    in-out property <string> hf-token;
+    in-out property <string> modelscope-token;
+    in property <string> token-help;
+    callback get-token(bool);
+    callback save-tokens;
+    callback tokens-edited;
+    in property <bool> saving-tokens;
+    in property <string> token-save-status;
+    in-out property <string> proxy;
+    in-out property <bool> allow-http;
+    in-out property <int> connections: 4;
+    in-out property <int> concurrent-files: 5;
+    in-out property <bool> verify: true;
+    in-out property <bool> notify: true;
+    in-out property <bool> sound;
+    in-out property <bool> debug;
+    in-out property <int> language-index;
+    in-out property <int> theme-index;
+    in property <string> log-directory;
+    in property <string> diagnostics-status;
+    callback save;
+    callback apply-access;
+    callback endpoint-edited;
+    callback appearance-edited;
+    padding: Tokens.gap;
+    spacing: Tokens.gap;
+    Text { text: @tr("Downloads and verification share the concurrent file limit."); wrap: word-wrap; }
+    settings-scroll := ScrollView {
+        horizontal-scrollbar-policy: always-off;
+        vertical-stretch: 1;
+        min-height: Tokens.control;
+        VerticalBox {
+            width: settings-scroll.visible-width;
+            padding: Tokens.gap;
+            spacing: Tokens.section;
+            VerticalBox {
+                spacing: Tokens.gap;
+                Text { text: @tr("Download access tokens"); font-size: Tokens.heading; }
+                Text { text: root.token-help; wrap: word-wrap; }
+                HorizontalBox {
+                    Text { text: "Hugging Face"; width: Tokens.label-width; }
+                    LineEdit { text <=> root.hf-token; input-type: password; accessible-label: @tr("Hugging Face token, saved in configuration"); enabled: !root.saving-tokens; edited => { root.tokens-edited(); } }
+                    Button { text: @tr("Get Hugging Face token"); clicked => { root.get-token(false); } }
+                }
+                HorizontalBox {
+                    Text { text: "ModelScope.ai"; width: Tokens.label-width; }
+                    LineEdit { text <=> root.modelscope-token; input-type: password; accessible-label: @tr("ModelScope token, saved in configuration"); enabled: !root.saving-tokens; edited => { root.tokens-edited(); } }
+                    Button { text: @tr("Get ModelScope token"); clicked => { root.get-token(true); } }
+                }
+                HorizontalBox {
+                    alignment: LayoutAlignment.start;
+                    Button { text: @tr("Save tokens"); primary: true; enabled: !root.saving-tokens; clicked => { root.save-tokens(); } }
+                    if root.token-save-status != "": Text { text: root.token-save-status; wrap: word-wrap; vertical-alignment: center; }
+                }
+                Text { text: @tr("Saved tokens remain available after restart. Clear a field and save to remove its token."); wrap: word-wrap; }
+            }
+            VerticalBox {
+                padding: 0px;
+                spacing: Tokens.gap;
+                Text { text: @tr("Appearance and language"); font-size: Tokens.heading; }
+                HorizontalBox {
+                    Text { text: @tr("Language"); width: Tokens.label-width; }
+                    ComboBox {
+                        width: 200px;
+                        enabled: !root.saving-tokens;
+                        horizontal-stretch: 0;
+                        model: ["English", "简体中文", "繁體中文"];
+                        current-index <=> root.language-index;
+                        accessible-label: @tr("Language");
+                        selected(value) => { root.appearance-edited(); }
+                    }
+                }
+                HorizontalBox {
+                    Text { text: @tr("Theme"); width: Tokens.label-width; }
+                    ComboBox {
+                        width: 200px;
+                        enabled: !root.saving-tokens;
+                        horizontal-stretch: 0;
+                        model: [@tr("System"), @tr("Light"), @tr("Dark")];
+                        current-index <=> root.theme-index;
+                        accessible-label: @tr("Theme");
+                        selected(value) => { root.appearance-edited(); }
+                    }
+                }
+            }
+            VerticalBox {
+                padding: 0px;
+                spacing: Tokens.gap;
+                Text { text: @tr("Download"); font-size: Tokens.heading; }
+                HorizontalBox {
+                    Text { text: @tr("Connections per file"); width: Tokens.label-width; }
+                    SpinBox { width: 120px; horizontal-stretch: 0; value <=> root.connections; minimum: 1; maximum: 10; accessible-label: @tr("Connections per file"); }
+                }
+                HorizontalBox {
+                    Text { text: @tr("Concurrent files"); width: Tokens.label-width; }
+                    SpinBox { width: 120px; horizontal-stretch: 0; value <=> root.concurrent-files; minimum: 1; maximum: 10; accessible-label: @tr("Concurrent files"); }
+                }
+                CheckBox { text: @tr("Verify file integrity after download"); checked <=> root.verify; }
+                Text { text: @tr("Applies to new tasks. Uses repository checksums and reads files after transfer."); wrap: word-wrap; }
+            }
+            VerticalBox {
+                padding: 0px;
+                spacing: Tokens.gap;
+                Text { text: @tr("Notifications"); font-size: Tokens.heading; }
+                CheckBox { text: @tr("Show a system notification when a task finishes"); checked <=> root.notify; }
+                CheckBox { text: @tr("Play a sound when a task finishes"); checked <=> root.sound; }
+            }
+            VerticalBox {
+                padding: 0px;
+                spacing: Tokens.gap;
+                Text { text: @tr("Diagnostics"); font-size: Tokens.heading; }
+                CheckBox { text: @tr("Enable Debug logging"); checked <=> root.debug; }
+                Text { text: @tr("Log directory"); }
+                HorizontalBox {
+                    log-path := LineEdit { text: root.log-directory; read-only: true; accessible-label: @tr("Log directory, select and copy"); }
+                    Button { text: @tr("Copy path"); enabled: root.log-directory != ""; clicked => { log-path.select-all(); log-path.copy(); } }
+                }
+                if root.diagnostics-status != "": Text { text: root.diagnostics-status; wrap: word-wrap; }
+                Text { text: @tr("Logs may contain local paths. Review them before sharing."); wrap: word-wrap; }
+            }
+            VerticalBox {
+                padding: 0px;
+                spacing: Tokens.gap;
+                Text { text: @tr("Advanced network"); font-size: Tokens.heading; }
+                HorizontalBox { Text { text: @tr("Endpoint"); width: Tokens.label-width; } LineEdit { text <=> root.endpoint; accessible-label: @tr("Endpoint"); edited => { root.endpoint-edited(); } } }
+                CheckBox { text: @tr("Allow HTTP for this endpoint (credentials travel unencrypted)"); checked <=> root.allow-http; }
+                HorizontalBox { Text { text: @tr("Revision"); width: Tokens.label-width; } LineEdit { text <=> root.revision; accessible-label: @tr("Requested revision"); } }
+                HorizontalBox { Text { text: @tr("Endpoint token override"); width: Tokens.label-width; } LineEdit { text <=> root.token; input-type: password; accessible-label: @tr("Endpoint token override, not saved"); } }
+                HorizontalBox { Text { text: @tr("Proxy"); width: Tokens.label-width; } LineEdit { text <=> root.proxy; input-type: password; accessible-label: @tr("Proxy address, password not saved"); placeholder-text: "http://user:password@host:port"; } }
+                Text { text: @tr("Changing the endpoint clears its temporary override. Saved platform tokens are used only with their own official site. Proxy passwords are not saved."); wrap: word-wrap; }
+            }
+        }
+    }
+    HorizontalBox {
+        alignment: LayoutAlignment.start;
+        Button { text: @tr("Save settings"); horizontal-stretch: 0; primary: true; enabled: !root.saving-tokens; clicked => { root.save(); } }
+        Button { text: @tr("Apply access to paused task"); horizontal-stretch: 0; clicked => { root.apply-access(); } }
+    }
+}

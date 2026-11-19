@@ -1,0 +1,761 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: zh_TW\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "Starting task core..."
+msgstr "正在啟動工作核心…"
+
+msgid "Choose a file name to inspect and copy its full path"
+msgstr "選擇檔名以查看並複製完整路徑"
+
+msgid "Concurrent files for this download"
+msgstr "本次下載的同時檔案數"
+
+msgid "Connections per file for this download"
+msgstr "本次下載的每檔案連線數"
+
+msgid "Enter a destination folder."
+msgstr "請輸入儲存目錄。"
+
+msgid "Select this path and copy it. Logs may contain local paths."
+msgstr "選取此路徑並複製。日誌可能包含本機路徑。"
+
+msgid "The repository stays locked while the file list is read. Cancel stops the read."
+msgstr "讀取檔案清單時儲存庫保持鎖定。取消會停止讀取。"
+
+msgid "These values apply to the download you start next. Settings keeps the defaults for later tasks."
+msgstr "這些值用於下一次開始的下載。設定保留之後工作的預設值。"
+
+msgid "This open task keeps the options it was created with. Change Settings to affect later tasks."
+msgstr "已開啟的工作保留建立時的選項。修改設定只影響之後的工作。"
+
+msgid "Use repository checksums after transfer. A missing checksum is reported as not verified."
+msgstr "傳輸結束後使用儲存庫校驗值核對。缺少校驗值時會提示未校驗。"
+
+msgid "Verification off for this download"
+msgstr "本次下載不校驗"
+
+msgid "Verify after this download"
+msgstr "本次下載後校驗"
+
+msgid "Verify after transfer"
+msgstr "傳輸後校驗"
+
+msgid "active"
+msgstr "生效中"
+
+msgid "connections"
+msgstr "個連線"
+
+msgid "files at once"
+msgstr "個檔案同時下載"
+
+msgid "No task open. Choose files or open a recent task."
+msgstr "尚未開啟工作。請選擇檔案或開啟最近工作。"
+
+msgid "Repository ID or HTTPS root URL"
+msgstr "儲存庫 ID 或 HTTPS 根網址"
+
+msgid "Dataset"
+msgstr "資料集"
+
+msgid "org/name"
+msgstr "org/name"
+
+msgid "Load files"
+msgstr "載入檔案"
+
+msgid "Files"
+msgstr "檔案"
+
+msgid "Task"
+msgstr "工作"
+
+msgid "Settings"
+msgstr "設定"
+
+msgid "Recent"
+msgstr "最近工作"
+
+msgid "Recent destinations"
+msgstr "最近目標目錄"
+
+msgid "Task record path (.hfdx/task.json)"
+msgstr "工作紀錄路徑（.hfdx/task.json）"
+
+msgid "Task record path"
+msgstr "工作紀錄路徑"
+
+msgid "Open paused"
+msgstr "以暫停狀態開啟"
+
+msgid "Forget record"
+msgstr "移除歷史紀錄"
+
+msgid "Forgetting history keeps all downloaded data."
+msgstr "移除歷史紀錄會保留所有已下載的資料。"
+
+msgid "About"
+msgstr "關於"
+
+msgid "HFDX\nRepository file downloads using a shared task core and aria2."
+msgstr "HFDX\n透過共用工作核心與 aria2 下載儲存庫檔案。"
+
+msgid "Filter files"
+msgstr "篩選檔案"
+
+msgid "Clear filter"
+msgstr "清除篩選"
+
+msgid "Show all files"
+msgstr "顯示全部檔案"
+
+msgid "Filter files, keywords or wildcards"
+msgstr "篩選檔案：關鍵字或萬用字元"
+
+msgid "Enter keywords or wildcards"
+msgstr "輸入關鍵字或萬用字元"
+
+msgid "One condition per line; match any (OR). Leave empty to show all.\nASCII case-insensitive. Examples: *.gguf or config.json on separate lines."
+msgstr "每行一個條件，符合任一條件即可（OR）；留空顯示全部。\n忽略 ASCII 大小寫。例如：將 *.gguf 與 config.json 分別寫在兩行。"
+
+msgid "Select matches"
+msgstr "全選符合項目"
+
+msgid "Deselect matches"
+msgstr "取消符合項目勾選"
+
+msgid "Show selected only"
+msgstr "僅顯示已選"
+
+msgid "Clear selection"
+msgstr "清除全部選擇"
+
+msgid "Details"
+msgstr "詳細資訊"
+
+msgid "Load a repository to choose files."
+msgstr "載入儲存庫後選擇檔案。"
+
+msgid "No files match this filter. Clear it or try another condition."
+msgstr "沒有符合條件的檔案。請清除篩選或嘗試其他條件。"
+
+msgid "Matching files are hidden by Show selected only. Choose Show all files to reveal them."
+msgstr "「僅顯示已選」隱藏了符合檔案。按「顯示全部檔案」查看。"
+
+msgid "Full file details, select and copy"
+msgstr "完整檔案資訊，可選取並複製"
+
+msgid "Choose Details to inspect and copy the full path"
+msgstr "按「詳細資訊」查看並複製完整路徑"
+
+msgid "Full destination path"
+msgstr "完整目標路徑"
+
+msgid "Browse"
+msgstr "瀏覽"
+
+msgid "Start download"
+msgstr "開始下載"
+
+msgid "Appearance and language"
+msgstr "外觀與語言"
+
+msgid "Language"
+msgstr "語言"
+
+msgid "Theme"
+msgstr "佈景主題"
+
+msgid "System"
+msgstr "跟隨系統"
+
+msgid "Light"
+msgstr "淺色"
+
+msgid "Dark"
+msgstr "深色"
+
+msgid "Download"
+msgstr "下載"
+
+msgid "Connections per file"
+msgstr "每個檔案的連線數"
+
+msgid "Concurrent files"
+msgstr "同時下載檔案數"
+
+msgid "Verify file integrity after download"
+msgstr "下載完成後驗證檔案完整性"
+
+msgid "Applies to new tasks. Uses repository checksums and reads files after transfer."
+msgstr "僅影響新工作。傳輸結束後讀取檔案，使用儲存庫提供的摘要進行驗證。"
+
+msgid "Notifications"
+msgstr "通知"
+
+msgid "Show a system notification when a task finishes"
+msgstr "工作完成時顯示系統通知"
+
+msgid "Play a sound when a task finishes"
+msgstr "工作完成時播放提示音"
+
+msgid "Diagnostics"
+msgstr "診斷"
+
+msgid "Enable Debug logging"
+msgstr "啟用 Debug 記錄"
+
+msgid "Log directory"
+msgstr "記錄目錄"
+
+msgid "Log directory, select and copy"
+msgstr "記錄目錄，可選取並複製"
+
+msgid "Copy path"
+msgstr "複製路徑"
+
+msgid "Logs may contain local paths. Review them before sharing."
+msgstr "記錄可能包含本機路徑。分享前請檢查。"
+
+msgid "Advanced network"
+msgstr "進階網路"
+
+msgid "Endpoint"
+msgstr "端點"
+
+msgid "Allow HTTP for this endpoint (credentials travel unencrypted)"
+msgstr "允許此端點使用 HTTP（憑證將以明文傳輸）"
+
+msgid "Revision"
+msgstr "版本"
+
+msgid "Requested revision"
+msgstr "要求的版本"
+
+msgid "Token (memory only)"
+msgstr "權杖（僅存於記憶體）"
+
+msgid "Access token, memory only"
+msgstr "存取權杖，僅存於記憶體"
+
+msgid "Proxy"
+msgstr "代理伺服器"
+
+msgid "Proxy address, password not saved"
+msgstr "代理伺服器位址，不儲存密碼"
+
+msgid "Changing the endpoint clears the token. Saved settings contain no token or proxy password."
+msgstr "變更端點會清除權杖。儲存的設定不包含權杖或代理伺服器密碼。"
+
+msgid "Save settings"
+msgstr "儲存設定"
+
+msgid "Apply access to paused task"
+msgstr "套用憑證至暫停工作"
+
+msgid "Task destination, select and copy"
+msgstr "工作目標目錄，可選取並複製"
+
+msgid "Pause"
+msgstr "暫停"
+
+msgid "Resume"
+msgstr "繼續"
+
+msgid "Retry failed"
+msgstr "重試失敗項目"
+
+msgid "Verify existing files"
+msgstr "驗證現有檔案"
+
+msgid "Active and failed files"
+msgstr "進行中與失敗的檔案"
+
+msgid "New download"
+msgstr "新建下載"
+
+msgid "Clear the repository field and return to a new download. An active task is not cancelled."
+msgstr "清除儲存庫輸入並回到新下載。正在執行的工作不會被取消。"
+
+msgid "History"
+msgstr "歷史"
+
+msgid "View and open an earlier task. Opening keeps it paused and does not start a download."
+msgstr "檢視並開啟先前的工作。開啟後保持暫停，不會自動下載。"
+
+msgid "Change language, theme, and defaults for later tasks, plus notifications and logs."
+msgstr "修改語言、佈景主題，以及之後工作的預設值、通知和記錄。"
+
+msgid "Help"
+msgstr "說明"
+
+msgid "Open usage notes, the log directory, and About Slint."
+msgstr "開啟使用說明、記錄目錄和 About Slint。"
+
+msgid "1 Choose a repository"
+msgstr "1 選擇儲存庫"
+
+msgid "Model repository"
+msgstr "模型儲存庫"
+
+msgid "Dataset repository"
+msgstr "資料集儲存庫"
+
+msgid "Repository kind"
+msgstr "儲存庫類型"
+
+msgid "A model repository stores a model and its configuration. A dataset repository stores training or evaluation data."
+msgstr "模型儲存庫存放模型與設定；資料集儲存庫存放訓練或評測資料。"
+
+msgid "Repository"
+msgstr "儲存庫"
+
+msgid "Paste a Hugging Face repository link or enter author/name. This does not run a model."
+msgstr "貼上 Hugging Face 儲存庫連結，或輸入作者/儲存庫名稱。這裡不會執行模型。"
+
+msgid "Paste a Hugging Face link, or enter author/name"
+msgstr "貼上 Hugging Face 連結，或輸入作者/儲存庫名稱"
+
+msgid "Refresh list"
+msgstr "重新整理清單"
+
+msgid "View files"
+msgstr "查看檔案清單"
+
+msgid "Read file names and sizes. It does not download the model; checking files is available after the list loads."
+msgstr "讀取檔名和大小，不下載模型；清單讀取完成後可以勾選檔案。"
+
+msgid "This reads the file list only. It does not download or load the model."
+msgstr "這裡只讀取檔案清單，不下載或載入模型。"
+
+msgid "Open settings"
+msgstr "開啟設定"
+
+msgid "Pause the current transfer or verification and keep its progress."
+msgstr "暫停目前的傳輸或驗證，並保留進度。"
+
+msgid "Continue the unfinished download or verification."
+msgstr "繼續未完成的下載或驗證。"
+
+msgid "Download only the owned files that failed, then verify them again."
+msgstr "只重新下載失敗的自有檔案，然後再次驗證。"
+
+msgid "Check files already downloaded. Opening a task never starts this automatically."
+msgstr "驗證已經下載的檔案。開啟工作不會自動開始驗證。"
+
+msgid "Open download folder"
+msgstr "開啟下載目錄"
+
+msgid "Open the destination in the system file manager. It does not run downloaded files."
+msgstr "在系統檔案總管中開啟儲存位置，不執行下載的檔案。"
+
+msgid "Back to download"
+msgstr "返回下載"
+
+msgid "Recent folders"
+msgstr "最近目錄"
+
+msgid "Choose a destination used before."
+msgstr "從先前使用的儲存位置中選擇。"
+
+msgid "Open the saved task paused. It does not resume automatically."
+msgstr "以暫停狀態開啟已儲存工作，不會自動繼續。"
+
+msgid "Remove this history entry. Downloaded files stay on disk."
+msgstr "移除這筆歷史紀錄，已下載檔案仍保留在磁碟上。"
+
+msgid "Opening history keeps the task paused. Closing this panel does not stop a running task."
+msgstr "從歷史開啟的工作保持暫停。關閉這個面板不會停止正在執行的工作。"
+
+msgid "Enter a repository, view its file list, check files, choose a folder, then start the download."
+msgstr "輸入儲存庫，查看檔案清單，勾選檔案，選擇目錄，然後開始下載。"
+
+msgid "Close help"
+msgstr "關閉說明"
+
+msgid "These values are saved as defaults for later tasks. The current task keeps the values it was created with."
+msgstr "這些值會儲存為之後工作的預設值。目前工作保留建立時使用的值。"
+
+msgid "Close"
+msgstr "關閉"
+
+msgid "2 Choose files"
+msgstr "2 選擇檔案"
+
+msgid "View the file list before choosing files."
+msgstr "先查看檔案清單，再選擇檔案。"
+
+msgid "Filter by file name or path. Supports * and ?. Filtering does not clear checked files."
+msgstr "依檔名或路徑篩選，支援 * 和 ?。篩選不會取消已勾選檔案。"
+
+msgid "Multiple conditions"
+msgstr "多條件"
+
+msgid "Show one condition per line. A file matches when any line matches."
+msgstr "展開多行輸入；每行一個條件，符合任一條件即可。"
+
+msgid "Selected only"
+msgstr "僅看已選"
+
+msgid "Show only checked files in the current filter. Turn it off to show every match."
+msgstr "只顯示目前篩選中已勾選的檔案；關閉後顯示全部符合項目。"
+
+msgid "More"
+msgstr "更多"
+
+msgid "More file actions"
+msgstr "更多檔案操作"
+
+msgid "Open actions that clear matches, all checks, or the filter."
+msgstr "開啟用於取消符合項目、清除選擇或清除篩選的操作。"
+
+msgid "Clear checks in the current matches. Checks hidden by the filter stay selected."
+msgstr "取消目前篩選結果的勾選；被篩選隱藏的已選檔案保持不變。"
+
+msgid "Clear all selection"
+msgstr "清除全部選擇"
+
+msgid "Clear every check, including hidden files. Downloaded files stay on disk."
+msgstr "取消所有檔案勾選，包括被篩選隱藏的檔案；不會刪除已下載檔案。"
+
+msgid "Clear filter and show all"
+msgstr "清除篩選並顯示全部"
+
+msgid "Remove every filter condition and show the complete file list."
+msgstr "移除全部篩選條件並顯示完整檔案清單。"
+
+msgid "One condition per line. A file matches when any line matches. Leave empty to show all."
+msgstr "每行一個條件，符合任一條件即可；留空顯示全部。"
+
+msgid "Some checked files are hidden by the current filter."
+msgstr "目前篩選隱藏了部分已勾選檔案。"
+
+msgid "Select current matches"
+msgstr "全選目前篩選結果"
+
+msgid "Check or clear every file matching the current filter. Hidden checks stay unchanged."
+msgstr "選取或取消目前篩選符合的全部檔案，不改變其他隱藏檔案的勾選。"
+
+msgid "Partial"
+msgstr "部分選取"
+
+msgid "File"
+msgstr "檔案"
+
+msgid "Size"
+msgstr "大小"
+
+msgid "File details"
+msgstr "檔案詳細資料"
+
+msgid "Show the full path and verification information for this file."
+msgstr "顯示這個檔案的完整路徑和驗證資訊。"
+
+msgid "View the repository files, then check the ones to download."
+msgstr "先查看儲存庫檔案，再勾選要下載的檔案。"
+
+msgid "No files match this filter."
+msgstr "沒有檔案符合目前篩選。"
+
+msgid "Matching files are hidden because only selected files are shown."
+msgstr "符合的檔案被隱藏，因為目前只顯示已選檔案。"
+
+msgid "Show all matches"
+msgstr "顯示全部符合項目"
+
+msgid "3 Confirm the destination"
+msgstr "3 確認儲存位置"
+
+msgid "Destination directory"
+msgstr "儲存目錄"
+
+msgid "Files are saved here and keep their paths inside the repository."
+msgstr "檔案儲存在這個目錄，並保留儲存庫內的子目錄結構。"
+
+msgid "Choose folder"
+msgstr "選擇資料夾"
+
+msgid "Open the system folder picker. Cancel leaves the current path unchanged."
+msgstr "開啟系統目錄選擇器；取消不會修改目前的儲存路徑。"
+
+msgid "Download options"
+msgstr "下載選項"
+
+msgid "Review connections, concurrent files, and verification for this download."
+msgstr "查看本次下載的連線數、同時下載數和完整性驗證設定。"
+
+msgid "Download the checked files. When verification is enabled, content is checked after transfer."
+msgstr "下載所選檔案；啟用驗證時，傳輸結束後會核對檔案內容。"
+
+msgid "Cancel"
+msgstr "取消"
+
+msgid "Cancel reading"
+msgstr "取消讀取"
+
+msgid "Stop reading the file list. Closing the window also stops the current work and saves it."
+msgstr "停止讀取檔案清單。關閉視窗也會停止目前工作並儲存。"
+
+msgid "The file list is still loading. Selecting every match stays unavailable until it is complete."
+msgstr "檔案清單仍在讀取。全部符合項目的選擇要等讀取完成後才能使用。"
+
+msgid "Show file activity"
+msgstr "顯示檔案活動"
+
+msgid "Hide file activity"
+msgstr "隱藏檔案活動"
+
+msgid "Show or hide each active and failed file. Hiding it does not change the task."
+msgstr "顯示或隱藏每個進行中和失敗的檔案。隱藏不會改變任務。"
+
+msgid "Closing the window stops the download and verification, then saves the task. Closing this panel does not."
+msgstr "關閉視窗會停止下載和驗證，然後儲存任務。關閉這個面板不會。"
+
+msgid "Download combinations (multiple selection)"
+msgstr "下載組合（可多選）"
+
+msgid "Preview final files"
+msgstr "預覽最終檔案"
+
+msgid "The checked files below are the final download list. Shared files count once. MTP and vision files are optional selections."
+msgstr "下方勾選的檔案就是最終下載清單；共用檔案只計算一次。可另外選擇視覺和 MTP 配套檔案。"
+
+msgid "Search combinations"
+msgstr "搜尋下載組合"
+
+msgid "Choose combinations"
+msgstr "選擇下載組合"
+
+msgid " (custom selection)"
+msgstr "（自訂選擇）"
+
+msgid "Downloads"
+msgstr "下載任務"
+
+msgid "Download task"
+msgstr "下載任務"
+
+msgid "Back to download setup"
+msgstr "返回下載設定"
+
+msgid "Search task files"
+msgstr "搜尋任務中的檔案"
+
+msgid "All files"
+msgstr "全部檔案"
+
+msgid "Downloading"
+msgstr "下載中"
+
+msgid "Waiting"
+msgstr "等待"
+
+msgid "Downloaded"
+msgstr "已下載"
+
+msgid "Failed"
+msgstr "失敗"
+
+msgid "Verifying"
+msgstr "驗證中"
+
+msgid "Status"
+msgstr "狀態"
+
+msgid "Progress / speed"
+msgstr "進度／速度"
+
+msgid "Verification"
+msgstr "驗證"
+
+msgid "Selected file details"
+msgstr "所選檔案詳情"
+
+msgid "Show every task file, progress, verification and errors."
+msgstr "查看任務全部檔案的進度、驗證和錯誤資訊。"
+
+msgid "Select a file to view its full path and error."
+msgstr "點選檔案查看完整路徑及錯誤資訊。"
+
+msgid "Return to download setup. The current task and draft are kept."
+msgstr "返回下載設定，保留目前任務及草稿。"
+
+msgid "Initializing download task. Connecting to the download engine…"
+msgstr "正在初始化下載任務，連線下載引擎…"
+
+msgid "Please wait. You can switch pages while the task is prepared."
+msgstr "請稍候，準備期間可以切換頁面。"
+
+msgid "Downloads and verification share the concurrent file limit."
+msgstr "下載和驗證共用同時處理檔案數上限。"
+
+msgid "Closing the window stops download and verification and saves the task. Switching tabs keeps the current task running."
+msgstr "關閉視窗會停止下載和驗證並儲存任務。切換標籤頁不會停止任務。"
+
+msgid "Opening a saved task keeps it paused. Switching tabs does not stop the current task."
+msgstr "開啟歷史任務後保持暫停。切換標籤頁不會停止目前任務。"
+
+msgid "Use the tabs to switch between download setup, tasks, history, settings and help. Draft selections and the current task are kept."
+msgstr "透過標籤頁切換新建下載、下載任務、歷史、設定和說明，保留草稿選擇及目前任務。"
+
+msgid "Completed files are verified as slots become available. Downloads and verification share one concurrency limit."
+msgstr "檔案下載完成後，有可用名額就開始驗證。下載和驗證共用一個檔案並行上限。"
+
+msgid "Pausing…"
+msgstr "正在暫停…"
+
+msgid "Add files to this version"
+msgstr "追加此版本檔案"
+
+msgid "Apply this policy to this submission only."
+msgstr "只對本次提交套用此策略。"
+
+msgid "Archive then replace"
+msgstr "封存後取代"
+
+msgid "Cancel submission"
+msgstr "取消本次提交"
+
+msgid "Compare remote file commit time with local modification time. Keep local when time is unavailable."
+msgstr "比較遠端檔案提交時間與本機修改時間，無法取得時間時保留本機。"
+
+msgid "Confirm and add"
+msgstr "確認並加入佇列"
+
+msgid "Continue queue"
+msgstr "繼續佇列"
+
+msgid "Existing files have different content"
+msgstr "既有檔案內容不同"
+
+msgid "Explicitly resume paused items in the queue."
+msgstr "明確繼續佇列中已暫停的下載項。"
+
+msgid "Keep the draft and leave existing tasks and files unchanged."
+msgstr "保留草稿，不修改既有任務和檔案。"
+
+msgid "Local"
+msgstr "本機"
+
+msgid "Remote"
+msgstr "遠端"
+
+msgid "Move only conflicting old files into archive, preserving their paths."
+msgstr "僅將衝突的舊檔案移入 archive，保留目錄結構。"
+
+msgid "Only if remote is newer"
+msgstr "僅遠端較新時取代"
+
+msgid "Only these conflicting files need a decision. Other versions in this folder stay unchanged."
+msgstr "只需決定這些衝突檔案的處理方式，此目錄下其他版本保持不動。"
+
+msgid "Overwrite"
+msgstr "直接覆寫"
+
+msgid "Pause all"
+msgstr "暫停全部"
+
+msgid "Pause all downloads and verification, keeping progress."
+msgstr "暫停全部下載與驗證，保留進度。"
+
+msgid "Prepare more files from this item's fixed commit and destination."
+msgstr "從此下載項的固定版本選擇更多檔案，沿用儲存目錄。"
+
+msgid "Queue file details"
+msgstr "佇列檔案詳細資料"
+
+msgid "Replace only conflicting files with the selected remote version."
+msgstr "只將衝突檔案取代為選定遠端版本的內容。"
+
+msgid "The queue shares the global concurrency limit in Settings."
+msgstr "所有下載項共用設定中的全域並行上限。"
+
+msgid "Add to download queue"
+msgstr "加入下載佇列"
+
+msgid "Pausing all…"
+msgstr "正在暫停全部…"
+
+msgid "Continuing queue…"
+msgstr "正在繼續佇列…"
+
+msgid "Already present"
+msgstr "已存在"
+
+msgid "Kept local"
+msgstr "已保留本機"
+
+msgid "Could not check"
+msgstr "無法核驗"
+
+msgid "These values apply to new download items. Appended files keep the existing item's connections and verification policy."
+msgstr "這些值用於新的下載項。追加檔案沿用原任務的連線數和校驗策略。"
+
+msgid "HFDX version and build"
+msgstr "HFDX 版本與建置"
+
+msgid "Set up tokens"
+msgstr "設定權杖"
+
+msgid "Download access tokens"
+msgstr "下載存取權杖"
+
+msgid "Hugging Face token, saved in configuration"
+msgstr "Hugging Face 權杖，儲存在設定檔中"
+
+msgid "ModelScope token, saved in configuration"
+msgstr "ModelScope 權杖，儲存在設定檔中"
+
+msgid "Get Hugging Face token"
+msgstr "取得 Hugging Face 權杖"
+
+msgid "Get ModelScope token"
+msgstr "取得 ModelScope 權杖"
+
+msgid "Save settings to keep these tokens after restart. Clear a field and save to remove its token. Tokens are stored in your local configuration, never in task records or logs."
+msgstr "儲存設定後，重新啟動仍可使用這些權杖。清空輸入並儲存即可刪除對應權杖。權杖儲存在本機設定檔，不進入工作記錄或日誌。"
+
+msgid "Endpoint token override"
+msgstr "暫時端點權杖"
+
+msgid "Endpoint token override, not saved"
+msgstr "暫時端點權杖，不儲存"
+
+msgid "Changing the endpoint clears its temporary override. Saved platform tokens are used only with their own official site. Proxy passwords are not saved."
+msgstr "變更端點會清空暫時權杖。已儲存的平台權杖僅用於各自的官方網站。代理密碼不儲存。"
+
+msgid "Paste a Hugging Face repository or ModelScope.ai model link. For author/name, choose the endpoint in Settings. This does not run a model."
+msgstr "貼上 Hugging Face 儲存庫或 ModelScope.ai 模型連結。使用作者/名稱時，請在設定中選擇端點。此操作不會執行模型。"
+
+msgid "Paste a Hugging Face / ModelScope.ai link, or author/name"
+msgstr "貼上 Hugging Face / ModelScope.ai 連結，或輸入作者/名稱"
+
+msgid "Delete task"
+msgstr "刪除工作"
+
+msgid "Remove this task from the queue? Its download will stop. Downloaded files and resume data are kept."
+msgstr "從佇列中刪除這個工作？下載將停止，已下載檔案及續傳資料會保留。"
+
+msgid "Confirm deletion"
+msgstr "確認刪除"
+
+msgid "View error details"
+msgstr "檢視錯誤詳情"
+
+msgid "Hide error details"
+msgstr "收合錯誤詳情"
+
+msgid "Open log folder"
+msgstr "開啟記錄資料夾"
+
+msgid "Error details"
+msgstr "錯誤詳情"
+
+msgid "Save tokens"
+msgstr "儲存權杖"
+
+msgid "Saved tokens remain available after restart. Clear a field and save to remove its token."
+msgstr "儲存後重新啟動仍可使用。清空輸入欄並儲存即可移除對應權杖。"

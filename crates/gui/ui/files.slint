@@ -1,0 +1,282 @@
+import { Button, CheckBox, HorizontalBox, LineEdit, ListView, ScrollView, TextEdit, VerticalBox } from "std-widgets.slint";
+import { Tokens } from "tokens.slint";
+import { HelpButton, HelpField } from "icons.slint";
+
+export struct FileRow { path: string, size: string, selected: bool }
+
+export component FilesPane inherits VerticalBox {
+    in-out property <string> filter;
+    in-out property <bool> selected-only;
+    in-out property <string> destination;
+    in-out property <string> details;
+    in property <string> summary;
+    in property <string> catalog-status;
+    in property <int> matching-count;
+    in property <int> selected-count;
+    in property <int> hidden-count;
+    in property <int> header-state;
+    in property <[FileRow]> rows;
+    in property <bool> ready;
+    in property <bool> loading;
+    in property <bool> can-start;
+    in property <bool> enabled: true;
+    in property <string> start-reason;
+    property <bool> has-destination: root.destination != "";
+    property <bool> can-download: root.can-start && root.has-destination;
+    property <string> destination-reason: root.has-destination ? root.start-reason : @tr("Enter a destination folder.");
+    in property <string> options-summary;
+    callback filter-edited(string);
+    callback selected-only-edited(bool);
+    callback selection-action(int);
+    callback toggle(int, bool);
+    callback inspect(int);
+    callback start;
+    callback browse;
+    callback choose-recent;
+    callback open-options;
+    property <bool> multiline-open;
+    property <bool> has-newline: root.filter.replace-all("\n", "").character-count != root.filter.character-count;
+    property <bool> multiline: root.multiline-open || root.has-newline;
+    property <bool> more-open;
+    property <string> filter-help: @tr("Filter by file name or path. Supports * and ?. Filtering does not clear checked files.");
+    property <string> header-help: @tr("Check or clear every file matching the current filter. Hidden checks stay unchanged.");
+    property <string> selected-help: @tr("Show only checked files in the current filter. Turn it off to show every match.");
+    spacing: Tokens.gap;
+    padding: Tokens.gap;
+
+    if !root.ready: Text { text: @tr("View the file list before choosing files."); wrap: word-wrap; }
+
+    HorizontalLayout {
+        height: root.multiline ? Tokens.filter-height : Tokens.control;
+        vertical-stretch: 0;
+        spacing: Tokens.gap;
+        Rectangle {
+            horizontal-stretch: 1;
+            height: root.multiline ? Tokens.filter-height : Tokens.control;
+            if !root.multiline: Rectangle {
+                width: 100%; height: 100%;
+                filter-input := LineEdit {
+                width: 100%;
+                height: 100%;
+                text <=> root.filter;
+                enabled: root.enabled;
+                accessible-label: @tr("Filter files");
+                accessible-description: root.filter-help;
+                placeholder-text: @tr("Enter keywords or wildcards");
+                edited => { root.filter-edited(self.text); }
+            }
+                HelpField { help: root.filter-help; editing: filter-input.has-focus; }
+            }
+            if root.multiline: TextEdit {
+                width: 100%;
+                height: 100%;
+                text <=> root.filter;
+                accessible-label: @tr("Multiple conditions");
+                accessible-description: @tr("One condition per line. A file matches when any line matches. Leave empty to show all.");
+                edited => { root.filter-edited(self.text); }
+            }
+        }
+        HelpButton {
+            icon: @image-url("icons/more.svg");
+            label: root.multiline ? @tr("Multiple conditions") + " " + @tr("active") : @tr("Multiple conditions");
+            help: @tr("Show one condition per line. A file matches when any line matches.");
+            checked: root.multiline;
+            clicked => { root.multiline-open = !root.multiline; }
+        }
+        HelpButton {
+            icon: @image-url("icons/search.svg");
+            label: @tr("Selected only") + " " + root.selected-count;
+            help: root.selected-help;
+            checked: root.selected-only;
+            clicked => { root.selected-only = !root.selected-only; root.selected-only-edited(root.selected-only); }
+        }
+        HelpButton {
+            icon: @image-url("icons/more.svg");
+            label: @tr("More");
+            help: @tr("Open actions that clear matches, all checks, or the filter.");
+            checked: root.more-open;
+            clicked => { root.more-open = !root.more-open; }
+        }
+    }
+    if root.multiline: Text {
+        text: @tr("One condition per line. A file matches when any line matches. Leave empty to show all.");
+        wrap: word-wrap;
+    }
+    if root.more-open: HorizontalLayout {
+        spacing: Tokens.gap;
+        HelpButton {
+            label: @tr("Deselect matches");
+            help: @tr("Clear checks in the current matches. Checks hidden by the filter stay selected.");
+            enabled: root.ready && root.enabled;
+            clicked => { root.selection-action(1); root.more-open = false; }
+        }
+        HelpButton {
+            label: @tr("Clear all selection");
+            help: @tr("Clear every check, including hidden files. Downloaded files stay on disk.");
+            enabled: root.enabled;
+            clicked => { root.selection-action(2); root.more-open = false; }
+        }
+        HelpButton {
+            label: @tr("Clear filter and show all");
+            help: @tr("Remove every filter condition and show the complete file list.");
+            enabled: root.filter != "" || root.selected-only;
+            clicked => { root.filter = ""; root.filter-edited(""); root.selected-only = false; root.selected-only-edited(false); root.more-open = false; }
+        }
+    }
+    Text { text: root.catalog-status; wrap: word-wrap; }
+    if root.hidden-count > 0: Text { text: @tr("Some checked files are hidden by the current filter."); wrap: word-wrap; }
+    HorizontalLayout {
+        width: 100%;
+        spacing: Tokens.gap;
+        Rectangle {
+            width: Tokens.control;
+            height: Tokens.control;
+            header := CheckBox {
+                checked: root.header-state == 2;
+                enabled: root.ready && root.enabled && !root.loading;
+                toggled => { root.selection-action(root.header-state == 2 ? 1 : 0); }
+                accessible-label: @tr("Select current matches");
+                accessible-description: root.header-help;
+            }
+            if root.header-state == 1: Text { text: "−"; width: Tokens.control; height: Tokens.control; horizontal-alignment: center; vertical-alignment: center; }
+        }
+        Text { text: @tr("File"); horizontal-stretch: 1; vertical-alignment: center; }
+        Text { width: 100px; horizontal-stretch: 0; text: @tr("Size"); horizontal-alignment: right; vertical-alignment: center; }
+    }
+    if root.loading: Text {
+        text: @tr("The file list is still loading. Selecting every match stays unavailable until it is complete.");
+        wrap: word-wrap;
+    }
+    ListView {
+        vertical-stretch: 1;
+        min-height: 160px;
+        preferred-height: 200px;
+        max-height: 280px;
+        for row[index] in root.rows: Rectangle {
+                height: Tokens.control;
+                HorizontalLayout {
+                    spacing: Tokens.gap;
+                    padding-left: Tokens.small;
+                    padding-right: Tokens.small;
+                    CheckBox {
+                        width: Tokens.control;
+                        horizontal-stretch: 0;
+                        checked: row.selected;
+                        enabled: root.enabled;
+                        accessible-label: row.path;
+                        toggled => { root.toggle(index, self.checked); }
+                    }
+                    Rectangle {
+                        horizontal-stretch: 1;
+                        Text { width: 100%; height: 100%; text: row.path; horizontal-alignment: left; vertical-alignment: center; overflow: elide; }
+                        TouchArea { clicked => { root.inspect(index); } }
+                        accessible-label: row.path;
+                        accessible-role: button;
+                        Tooltip { text: @markdown("{@tr(\"Show the full path and verification information for this file.\")}"); }
+                    }
+                    Text { width: 100px; horizontal-stretch: 0; text: row.size; horizontal-alignment: right; vertical-alignment: center; }
+                }
+            }
+    }
+    if root.rows.length == 0: HorizontalLayout {
+        spacing: Tokens.gap;
+        Text {
+            text: !root.ready ? @tr("View the repository files, then check the ones to download.")
+                : root.matching-count == 0 ? @tr("No files match this filter.")
+                : @tr("Matching files are hidden because only selected files are shown.");
+            wrap: word-wrap;
+            horizontal-stretch: 1;
+            vertical-alignment: center;
+        }
+        if root.ready && root.matching-count == 0: Button {
+            text: @tr("Clear filter");
+            clicked => { root.filter = ""; root.filter-edited(""); }
+        }
+        if root.ready && root.matching-count > 0: Button {
+            text: @tr("Show all matches");
+            clicked => { root.selected-only = false; root.selected-only-edited(false); }
+        }
+    }
+    LineEdit {
+        height: Tokens.control;
+        vertical-stretch: 0;
+        text <=> root.details;
+        read-only: true;
+        accessible-label: @tr("Full file details, select and copy");
+        placeholder-text: @tr("Choose a file name to inspect and copy its full path");
+    }
+}
+
+export component DestinationPane inherits VerticalBox {
+    in property <bool> enqueue;
+    in-out property <string> destination;
+    in property <bool> can-start;
+    in property <bool> enabled;
+    in property <string> start-reason;
+    in property <string> options-summary;
+    in property <string> summary;
+    callback browse; callback choose-recent; callback open-options; callback start;
+    property <bool> has-destination: root.destination != "";
+    property <bool> can-download: root.can-start && root.has-destination;
+    property <string> destination-reason: root.has-destination ? root.start-reason : @tr("Enter a destination folder.");
+    padding: Tokens.gap;
+    spacing: Tokens.gap;
+    Text { text: @tr("3 Confirm the destination"); font-size: Tokens.heading; }
+    HorizontalLayout {
+        spacing: Tokens.gap;
+        Rectangle {
+            horizontal-stretch: 1;
+            height: Tokens.control;
+            destination := LineEdit {
+                width: 100%;
+                height: 100%;
+                text <=> root.destination;
+                enabled: root.enabled;
+                accessible-label: @tr("Destination directory");
+                accessible-description: @tr("Files are saved here and keep their paths inside the repository.");
+            }
+            HelpField { help: @tr("Files are saved here and keep their paths inside the repository."); editing: destination.has-focus; }
+        }
+        HelpButton {
+            icon: @image-url("icons/folder.svg");
+            label: @tr("Choose folder");
+            help: @tr("Open the system folder picker. Cancel leaves the current path unchanged.");
+            enabled: root.enabled;
+            clicked => { root.browse(); }
+        }
+        HelpButton {
+            icon: @image-url("icons/history.svg");
+            label: @tr("Recent folders");
+            help: @tr("Choose a destination used before.");
+            clicked => { root.choose-recent(); }
+        }
+    }
+    HorizontalLayout {
+        spacing: Tokens.gap;
+        alignment: LayoutAlignment.start;
+        Text { text: root.options-summary; wrap: word-wrap; horizontal-stretch: 1; vertical-alignment: center; }
+        HelpButton {
+            label: @tr("Download options");
+            help: @tr("Review connections, concurrent files, and verification for this download.");
+            clicked => { root.open-options(); }
+        }
+    }
+    HorizontalLayout {
+        spacing: Tokens.gap;
+        alignment: LayoutAlignment.start;
+        VerticalLayout {
+            horizontal-stretch: 1;
+            alignment: center;
+            Text { text: root.summary; wrap: word-wrap; }
+            if !root.can-download: Text { text: root.destination-reason; wrap: word-wrap; }
+        }
+        HelpButton {
+            icon: @image-url("icons/download.svg");
+            label: root.enqueue ? @tr("Add to download queue") : @tr("Start download");
+            help: @tr("Download the checked files. When verification is enabled, content is checked after transfer.");
+            primary: root.can-download;
+            enabled: root.can-download;
+            clicked => { root.start(); }
+        }
+    }
+}

@@ -1,0 +1,14 @@
+/target/
+.env
+.env.*
+
+# Python QA runtime caches
+__pycache__/
+*.py[cod]
+
+# Local settings, transfer state and diagnostic output
+settings.json
+.hfd/
+.hfdx/
+*.aria2
+*.log
