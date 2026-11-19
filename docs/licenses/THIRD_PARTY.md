@@ -1,6 +1,6 @@
 # Third-party distribution notices
 
-Project terms are in LICENSE. This inventory covers the Linux x86_64 GUI and TUI build. Third-party components retain their own terms.
+Project-owned code is available under PolyForm Noncommercial 1.0.0. Commercial use outside its permitted purposes requires a separate license from the rights holder. See the project LICENSE. This inventory covers the Linux x86_64 GUI and TUI build. Third-party components retain their own terms.
 
 ## Slint distribution route
 

@@ -8,7 +8,7 @@ priority: optional
 maintainer: skygunner <84759+skygunner@users.noreply.github.com>
 description: Desktop and terminal downloader for Hugging Face and ModelScope.
 homepage: https://github.com/skygunner/hfdx
-license: LicenseRef-hfdx
+license: PolyForm-Noncommercial-1.0.0
 contents:
   - src: ${ASSETS}/hfdx-linux-${CPU}
     dst: /usr/bin/hfdx

@@ -4,7 +4,13 @@
 
 hfdx is a Rust downloader for Hugging Face models and datasets and for ModelScope models. Use the desktop GUI to select shards, preview disk usage and manage several repositories, or use the terminal UI (TUI) over SSH.
 
+Project-owned hfdx code is available under **PolyForm Noncommercial 1.0.0**. You may use, modify and distribute the source and binaries free of charge for purposes permitted by the license. Preserve the terms and required notices when redistributing. Commercial uses outside those purposes, including downloading models for business operations or integrating hfdx into a paid product, require a separate commercial license from the rights holder in advance. Third-party components, including aria2 and Slint, retain their own terms. [License](LICENSE) · [Contact the maintainer about commercial licensing](https://github.com/skygunner) · [Third-party notices](docs/licenses/THIRD_PARTY.md)
+
+These terms apply to versions carrying this license. The published v0.2.1 packages include the earlier terms. Consult the bundled LICENSE when using that release.
+
 ## Download and install
+
+Choose a distribution package for a system-wide Linux installation managed by an administrator. Choose a portable archive for a shared server, a rootless installation or the built-in updater. On Windows x64, choose the ZIP.
 
 ### Linux distribution packages
 
@@ -22,11 +28,11 @@ Your package manager resolves dependencies, including aria2. Open **hfdx** from 
 
 Download `hfdx-linux-x86_64.tar.gz`, `hfdx-linux-aarch64.tar.gz` or `hfdx-windows-x86_64.zip` and SHA256SUMS from the same release. Each archive includes both interfaces. The individual executables on the release page are also used by the built-in updater.
 
-For a per-user Linux installation, install aria2 and run the following in your download directory:
+The portable Linux archive installs in your home directory. Check `aria2c --version` first. If it is missing, put a compatible aria2c on your user PATH or ask your administrator to provide it. In the download directory, run:
 
 ```sh
 package=hfdx-linux-$(uname -m)
-sha256sum --ignore-missing -c SHA256SUMS &&
+awk -v f="$package.tar.gz" '$2 == f { print }' SHA256SUMS | sha256sum -c - &&
 tar -xzf "$package.tar.gz" &&
 mkdir -p ~/.local/bin &&
 install -m 755 "$package/hfdx" "$package/hfdx-gui" ~/.local/bin/
@@ -36,7 +42,7 @@ Start `~/.local/bin/hfdx-gui` on the desktop or `~/.local/bin/hfdx` in a termina
 
 ### Installation prompt to copy to an agent
 
-> Install the latest stable release of https://github.com/skygunner/hfdx for this machine. Check the OS, architecture, glibc and aria2c. Prefer the official Release's compatible deb, rpm or pacman package and verify it against SHA256SUMS.native before installing it with the system package manager. For a per-user installation, use the portable archive and SHA256SUMS. If no compatible binary is available, build from the release tag with Cargo --locked. On a headless server, install only the TUI if building from source. Run the installed program with --help and aria2c --version, then report the installation paths, version and launch commands. Leave token entry to me.
+> Install the stable release from https://github.com/skygunner/hfdx/releases/latest that matches my OS, architecture and system libraries. Check existing installations, privileges and aria2c. For an authorized system-wide Linux installation, verify the selected deb, rpm or pacman package against SHA256SUMS.native from the same release and install with the package manager. For a rootless or per-user installation, verify the Linux tar.gz against SHA256SUMS and install in ~/.local/bin as the current user. A headless server only needs hfdx. On Windows x64, verify the ZIP against SHA256SUMS and extract it to a user-writable directory. Verify aria2c is on my PATH or report the missing dependency. If no compatible binary exists, build from the release tag with Cargo --locked. Verify the installed program and aria2c versions and report the installation paths, launch commands and upgrade method. Leave token entry to me and remind me that commercial use requires separate authorization.
 
 ## Your first download
 

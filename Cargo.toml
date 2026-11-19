@@ -4,5 +4,6 @@ members = ["crates/core", "crates/tui", "crates/gui"]
 default-members = ["crates/core", "crates/tui"]
 
 [workspace.package]
+license = "PolyForm-Noncommercial-1.0.0"
 version = "0.2.1"
 edition = "2024"

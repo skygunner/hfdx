@@ -4,7 +4,13 @@
 
 hfdx 是用 Rust 编写的 Hugging Face 和 ModelScope 下载器。桌面用户可以在 GUI 中挑选模型分片、预览大小、管理多个仓库；通过 SSH 登录服务器时，可以在 TUI 中完成同样的下载流程。Hugging Face 同时支持模型和数据集，ModelScope 支持模型。
 
+hfdx 自有代码采用 **PolyForm Noncommercial 1.0.0**。在许可允许的非商业用途范围内，可以免费使用、修改和分发源码与程序，分发时须保留许可与必要声明。企业为自身业务下载模型、将 hfdx 集成到收费产品等超出许可范围的商业用途，须事先向权利人取得单独商业授权。aria2、Slint 等第三方组件各自适用原有许可。[许可全文](LICENSE) · [联系维护者咨询商业授权](https://github.com/skygunner) · [第三方声明](docs/licenses/THIRD_PARTY.md)
+
+上述许可适用于包含本许可的版本。已发布的 v0.2.1 安装包附有当时的许可，使用该版本时请查阅包内 LICENSE。
+
 ## 下载与安装
+
+有系统安装权限并希望统一管理升级时，选发行版包；没有 root 权限、在共享服务器上安装，或希望用内置更新器时，选 Linux 便携版。Windows x64 选 ZIP。
 
 ### Linux 发行版安装包
 
@@ -28,11 +34,11 @@ hfdx 是用 Rust 编写的 Hugging Face 和 ModelScope 下载器。桌面用户�
 | Linux ARM64（aarch64） | hfdx-linux-aarch64.tar.gz |
 | Windows x64 | hfdx-windows-x86_64.zip |
 
-在 Linux 上安装 aria2（Debian/Ubuntu 使用 `sudo apt install aria2`），选择架构后执行：
+Linux 便携版直接装入自己的目录。先运行 `aria2c --version`。若缺少 aria2c，可将兼容的 aria2c 放入用户 PATH（例如已加入 PATH 的 `~/.local/bin`），或请管理员提供。然后在下载目录执行：
 
 ```sh
 package=hfdx-linux-$(uname -m)
-sha256sum --ignore-missing -c SHA256SUMS &&
+awk -v f="$package.tar.gz" '$2 == f { print }' SHA256SUMS | sha256sum -c - &&
 tar -xzf "$package.tar.gz" &&
 mkdir -p ~/.local/bin &&
 install -m 755 "$package/hfdx" "$package/hfdx-gui" ~/.local/bin/
@@ -42,7 +48,7 @@ install -m 755 "$package/hfdx" "$package/hfdx-gui" ~/.local/bin/
 
 ### 复制给 Agent 的一键安装提示词
 
-> 请为当前用户安装 https://github.com/skygunner/hfdx 的最新正式版。先检查系统、CPU、glibc 和 aria2c，优先从官方 GitHub Release 下载对应发行版的 deb、rpm 或 pacman 包，按配套 SHA256SUMS.native 校验后用系统包管理器安装；需要用户目录安装时选择便携包，按 SHA256SUMS 校验。没有兼容二进制时，从该发行标签按 README 用 Cargo 的 --locked 选项构建；无桌面的服务器只安装 TUI。最后运行已安装程序的 --help 和 aria2c --version，告诉我版本、安装路径和启动命令。让我自己在界面里填写平台令牌。
+> 请从 https://github.com/skygunner/hfdx/releases/latest 安装与我的系统、CPU 及运行库兼容的正式版。先检查已有安装位置、权限及 aria2c。需要全局安装且有相应授权时，选 deb、rpm 或 pacman 包，按同版 SHA256SUMS.native 核对所选文件后用系统包管理器安装。无 root 权限或仅为我安装时，选 Linux tar.gz，按同版 SHA256SUMS 核对所选文件后用普通用户权限装入 ~/.local/bin；无桌面只需 hfdx。Windows x64 选 ZIP，按 SHA256SUMS 校验后解压到用户目录。确认为用户 PATH 提供了可用的 aria2c；如缺少依赖请说明。没有兼容包时从发行标签用 Cargo --locked 构建。最后验证程序和 aria2c 的版本，告诉我安装路径、启动和升级方式。平台令牌由我在程序内填写，商业用途请提醒我另行取得授权。
 
 ## 第一次下载
 
@@ -62,7 +68,7 @@ TUI 用 Tab 切换输入位置，用终端粘贴快捷键输入。F3 加载文�
 
 ## 检查更新与反馈
 
-GUI 和 TUI 的设置均支持手动检查 GitHub 正式版。自动检查默认关闭，可选每天、每周或每 30 天；GUI 修改后点击保存。发现新版后选择“更新”，程序按当前平台与界面下载可执行文件，核对 GitHub 发布的 SHA-256 后替换。GUI 和 TUI 可分别更新。安装目录需要当前用户有写权限。正在下载、校验或准备任务时可继续工作；队列空闲后才会询问是否重启。选择“稍后”可在设置中再次请求重启。
+GUI 和 TUI 的设置均支持手动检查 GitHub 正式版。自动检查默认关闭，可选每天、每周或每 30 天；GUI 修改后点击保存。发行版包通过包管理器升级。便携版发现新版后选择“更新”，程序按当前平台与界面下载可执行文件，核对 GitHub 发布的 SHA-256 后替换。GUI 和 TUI 可分别更新。安装目录需要当前用户有写权限。正在下载、校验或准备任务时可继续工作；队列空闲后才会询问是否重启。选择“稍后”可在设置中再次请求重启。
 
 选择“起草 GitHub Issue”会打开浏览器，将程序版本、平台、错误类别、状态码和最近的日志计数预填到草稿。用户可修改并决定是否提交。草稿省略账户、令牌、原始日志、时间戳、仓库名、本地路径和任务标识。也可直接[提交 Issue](https://github.com/skygunner/hfdx/issues/new) 或通过 fork 提交 PR。
 
