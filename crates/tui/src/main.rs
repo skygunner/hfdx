@@ -252,7 +252,16 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     joined?;
     notification_joined?;
     if let Some(path) = restart {
-        hfdx_core::updates::restart(&path)?;
+        // Keep the interactive shell waiting for its foreground command.
+        #[cfg(unix)]
+        {
+            use std::os::unix::process::CommandExt;
+            return Err(std::process::Command::new(path).exec().into());
+        }
+        #[cfg(not(unix))]
+        if !std::process::Command::new(path).status()?.success() {
+            return Err("Restarted TUI exited unsuccessfully".into());
+        }
     }
     Ok(())
 }

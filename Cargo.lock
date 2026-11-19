@@ -1981,7 +1981,7 @@ checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
 
 [[package]]
 name = "hfdx-core"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "dirs",
  "flexi_logger",
@@ -2007,7 +2007,7 @@ dependencies = [
 
 [[package]]
 name = "hfdx-gui"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "hfdx-core",
  "rfd",
@@ -2020,7 +2020,7 @@ dependencies = [
 
 [[package]]
 name = "hfdx-tui"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "crossterm",
  "hfdx-core",
