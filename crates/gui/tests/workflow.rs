@@ -431,3 +431,30 @@ fn public_gguf_combinations_preview_exact_union() {
     worker.join().unwrap().unwrap();
     assert_eq!(stage.get(), 4);
 }
+
+#[test]
+fn clean_shutdown_with_service_warning_succeeds() {
+    let root = tempfile::tempdir().unwrap();
+    let ui = AppWindow::new().expect("native window");
+    let (bridge, worker) = bridge::Bridge::start_with_platform(
+        &ui,
+        CoreConfig {
+            paths: SettingsPaths {
+                settings_file: root.path().join("settings.json"),
+            },
+            aria2_executable: "aria2c".into(),
+        },
+        Err(hfdx_core::notification::NotificationError::IdentityUnavailable),
+    )
+    .unwrap();
+    bridge.handle.request_shutdown().unwrap();
+    worker.join().unwrap().expect("clean core shutdown");
+    let mailbox = bridge.mailbox.lock().unwrap();
+    assert!(mailbox.finished);
+    assert!(
+        mailbox
+            .error
+            .as_ref()
+            .is_some_and(|warning| !warning.is_empty())
+    );
+}

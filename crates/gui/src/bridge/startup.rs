@@ -85,23 +85,22 @@ impl Bridge {
                     .map(|b| b.snapshot.settings.effective_language())
                     .unwrap_or(hfdx_core::storage::Language::English);
                 let diagnostics = services.text(language);
-                let message = result.as_ref().err().map(|error| hfdx_core::locale::error(language, &error.ui_error()));
-                let final_message = [message.clone(), (!diagnostics.is_empty()).then_some(diagnostics)].into_iter().flatten().reduce(|left, right| format!("{left}\n{right}"));
+                let shutdown = result.map(|_| ()).map_err(|error| hfdx_core::locale::error(language, &error.ui_error()));
+                if shutdown.is_ok() && !diagnostics.is_empty() {
+                    eprintln!("hfdx-gui: {diagnostics}");
+                }
+                let final_message = [shutdown.as_ref().err().cloned(), (!diagnostics.is_empty()).then_some(diagnostics)].into_iter().flatten().reduce(|left, right| format!("{left}\n{right}"));
                 match bridge.mailbox.lock() {
                     Ok(mut box_) => {
                         box_.finished = true;
-                        if let Some(error) = final_message.clone() {
+                        if let Some(error) = final_message {
                             box_.error = Some(error);
                         }
                     }
                     Err(_) => eprintln!("GUI shutdown mailbox poisoned"),
                 }
                 bridge.refresh();
-                match (result, final_message) {
-                    (Ok(_), None) => Ok(()),
-                    (_, Some(message)) => Err(message),
-                    (Err(_), None) => Err("Core shutdown failed".into()),
-                }
+                shutdown
             })
         });
         match rx.recv() {

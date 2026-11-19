@@ -147,9 +147,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
     let result = ui.run();
     timer.stop();
-    if bridge.handle.request_shutdown().is_err() {
-        eprintln!("Core already closed");
-    }
+    // Closing the window normally has already stopped the core.
+    let _ = bridge.handle.request_shutdown();
     let joined = worker.join();
     result?;
     match joined {
