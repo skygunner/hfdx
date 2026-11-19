@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=hfdx
+Comment=Download models from Hugging Face and ModelScope
+Exec=hfdx-gui
+Terminal=false
+Categories=Network;FileTransfer;

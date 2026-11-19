@@ -1,0 +1,53 @@
+name: hfdx
+arch: ${PKG_ARCH}
+platform: linux
+version: ${PKG_VERSION}
+release: 1
+section: net
+priority: optional
+maintainer: skygunner <84759+skygunner@users.noreply.github.com>
+description: Desktop and terminal downloader for Hugging Face and ModelScope.
+homepage: https://github.com/skygunner/hfdx
+license: LicenseRef-hfdx
+contents:
+  - src: ${ASSETS}/hfdx-linux-${CPU}
+    dst: /usr/bin/hfdx
+    file_info:
+      mode: 0755
+  - src: ${ASSETS}/hfdx-gui-linux-${CPU}
+    dst: /usr/bin/hfdx-gui
+    file_info:
+      mode: 0755
+  - src: packaging/hfdx.desktop
+    dst: /usr/share/applications/hfdx.desktop
+  - src: LICENSE
+    dst: /usr/share/licenses/hfdx/LICENSE
+  - src: docs/licenses/*
+    dst: /usr/share/licenses/hfdx/docs/licenses/
+  - src: crates/gui/ui/icons/LICENSE.txt
+    dst: /usr/share/licenses/hfdx/icons/LICENSE.txt
+  - src: README.md
+    dst: /usr/share/doc/hfdx/README.md
+  - src: README.en.md
+    dst: /usr/share/doc/hfdx/README.en.md
+  - src: README.zh-TW.md
+    dst: /usr/share/doc/hfdx/README.zh-TW.md
+  - src: /usr/share/licenses/hfdx/LICENSE
+    dst: /usr/share/doc/hfdx/LICENSE
+    type: symlink
+  - src: /usr/share/licenses/hfdx/docs
+    dst: /usr/share/doc/hfdx/docs
+    type: symlink
+overrides:
+  deb:
+    depends:
+      - aria2
+      - libc6 (>= ${LIBC})
+      - libfontconfig1
+      - libgcc-s1
+    recommends: [libxkbcommon-x11-0, libxcursor1, libxi6, libx11-xcb1, xdg-utils]
+  rpm:
+    depends: [aria2, "glibc >= ${LIBC}", fontconfig, libgcc]
+    recommends: [libxkbcommon-x11, libXcursor, libXi, libX11-xcb, xdg-utils]
+  archlinux:
+    depends: [aria2, "glibc>=${LIBC}", fontconfig, gcc-libs, libxkbcommon-x11, libxcursor, libxi, libx11, xdg-utils]

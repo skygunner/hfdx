@@ -1,8 +1,24 @@
 # hfdx
 
+[简体中文](README.md) · [繁體中文](README.zh-TW.md) · [English](README.en.md)
+
 hfdx 是用 Rust 编写的 Hugging Face 和 ModelScope 下载器。桌面用户可以在 GUI 中挑选模型分片、预览大小、管理多个仓库；通过 SSH 登录服务器时，可以在 TUI 中完成同样的下载流程。Hugging Face 同时支持模型和数据集，ModelScope 支持模型。
 
 ## 下载与安装
+
+### Linux 发行版安装包
+
+在 [Releases](https://github.com/skygunner/hfdx/releases/latest) 选择对应发行版和 CPU 架构的安装包。同时下载 SHA256SUMS.native，在下载目录运行 `sha256sum --ignore-missing -c SHA256SUMS.native`，确认所选包显示 OK。三个格式都包含 GUI、TUI 和桌面菜单入口。包管理器会安装 aria2 等依赖，并记录文件以便升级和卸载。
+
+| 发行版 | 下载格式 | 在下载目录安装（将文件名换为实际下载的包） |
+| --- | --- | --- |
+| Debian / Ubuntu | `.deb`（amd64 / arm64） | `sudo apt install ./文件名.deb` |
+| Fedora 等 RPM 系统 | `.rpm`（x86_64 / aarch64） | `sudo dnf install ./文件名.rpm` |
+| Arch Linux / Arch Linux ARM | `.pkg.tar.zst`（x86_64 / aarch64） | `sudo pacman -U ./文件名.pkg.tar.zst` |
+
+在菜单中打开 **hfdx**，或运行 `hfdx-gui` / `hfdx`。这些包由项目在 GitHub 发布。安装新版请下载新包并重复相应命令；系统包管理器负责管理 `/usr/bin` 下的程序。卸载使用 `sudo apt remove hfdx`、`sudo dnf remove hfdx` 或 `sudo pacman -R hfdx`。
+
+### 便携版与 Windows
 
 从 [GitHub Releases](https://github.com/skygunner/hfdx/releases/latest) 下载对应平台的软件包及 SHA256SUMS。包内含桌面程序和终端程序；Release 中同名平台的独立可执行文件也供内置更新器使用。
 
@@ -26,7 +42,7 @@ install -m 755 "$package/hfdx" "$package/hfdx-gui" ~/.local/bin/
 
 ### 复制给 Agent 的一键安装提示词
 
-> 请为当前用户安装 https://github.com/skygunner/hfdx 的最新正式版。先检查系统、CPU、glibc 和 aria2c，在官方 GitHub Release 下载兼容的压缩包及 SHA256SUMS，验证成功后安装到用户的可执行目录。没有兼容二进制时，从该发行标签按 README 用 Cargo 的 --locked 选项构建；无桌面的服务器只安装 TUI。最后运行已安装程序的 --help 和 aria2c --version，告诉我版本、安装路径和启动命令。让我自己在界面里填写平台令牌。
+> 请为当前用户安装 https://github.com/skygunner/hfdx 的最新正式版。先检查系统、CPU、glibc 和 aria2c，优先从官方 GitHub Release 下载对应发行版的 deb、rpm 或 pacman 包，按配套 SHA256SUMS.native 校验后用系统包管理器安装；需要用户目录安装时选择便携包，按 SHA256SUMS 校验。没有兼容二进制时，从该发行标签按 README 用 Cargo 的 --locked 选项构建；无桌面的服务器只安装 TUI。最后运行已安装程序的 --help 和 aria2c --version，告诉我版本、安装路径和启动命令。让我自己在界面里填写平台令牌。
 
 ## 第一次下载
 
