@@ -61,6 +61,8 @@ fn endpoint_change_clears_token_before_load() {
         verify_after_download: true,
         notify_on_completion: true,
         sound_on_completion: false,
+        auto_update_check: false,
+        update_interval: Default::default(),
         debug_logging: false,
         theme: Theme::System,
         language: None,

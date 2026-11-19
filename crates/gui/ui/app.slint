@@ -182,6 +182,7 @@ export component AppWindow inherits Window {
     }
 
     workspace := FocusScope {
+        enabled: !root.restart-prompt;
         key-pressed(event) => {
             if event.text == Key.Escape && (root.panel-open || root.options-open) {
                 root.close-panels();
@@ -196,6 +197,9 @@ export component AppWindow inherits Window {
             HorizontalLayout {
                 spacing: Tokens.gap;
                 alignment: center;
+                if root.can-update && !root.settings-open: Button {
+                    text: @tr("Update"); clicked => { root.close-panels(); root.settings-open = true; }
+                }
                 Text { text: "HFDX"; font-size: Tokens.heading; vertical-alignment: center; }
                 HelpButton {
                     icon: @image-url("icons/list.svg");

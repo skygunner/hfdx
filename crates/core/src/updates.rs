@@ -71,9 +71,10 @@ pub struct Updates {
 }
 impl Updates {
     pub fn new(name: &'static str) -> Self {
-        let marker = crate::storage::settings_paths()
-            .ok()
-            .map(|p| p.settings_file.with_file_name("update-last-check"));
+        let marker = crate::storage::settings_paths().ok().map(|p| {
+            p.settings_file
+                .with_file_name(format!("{name}-last-update-check"))
+        });
         let last = marker
             .as_ref()
             .and_then(|p| fs::metadata(p).ok()?.modified().ok());
@@ -180,7 +181,11 @@ fn active(s: &AppSnapshot) -> bool {
     };
     busy(s.phase)
         || s.queue.as_ref().is_some_and(|q| {
-            q.preparing || q.used_slots > 0 || q.tasks.iter().any(|t| busy(t.phase))
+            q.preparing
+                || q.used_slots > 0
+                || q.tasks
+                    .iter()
+                    .any(|t| busy(t.phase) || t.view.record.state == crate::TaskState::Running)
         })
 }
 fn client() -> Result<reqwest::Client, String> {
@@ -296,7 +301,7 @@ async fn install(up: &Upgrade) -> Result<(), String> {
 pub fn restart(path: &Path) -> std::io::Result<()> {
     Command::new(path).spawn().map(|_| ())
 }
-pub fn issue(s: &AppSnapshot, ui: &str) -> std::io::Result<()> {
+fn issue_url(s: &AppSnapshot, ui: &str) -> std::io::Result<url::Url> {
     let mut body = format!(
         "## What happened? / 问题描述\n\n\n## Diagnostics\nhfdx {} | {} | {} {}\n",
         crate::version::VERSION,
@@ -305,11 +310,11 @@ pub fn issue(s: &AppSnapshot, ui: &str) -> std::io::Result<()> {
         std::env::consts::ARCH
     );
     let mut errors = std::collections::BTreeSet::new();
-    for err in s.error.iter().chain(
-        s.queue
+    for err in s.error.iter().chain(s.queue.iter().flat_map(|q| {
+        q.draft_error
             .iter()
-            .flat_map(|q| q.tasks.iter().filter_map(|t| t.error.as_ref())),
-    ) {
+            .chain(q.tasks.iter().filter_map(|t| t.error.as_ref()))
+    })) {
         use crate::task::ErrorDetail;
         let detail = match &err.detail {
             Some(ErrorDetail::Http { status, .. }) => format!(" HTTP {status}"),
@@ -344,6 +349,10 @@ pub fn issue(s: &AppSnapshot, ui: &str) -> std::io::Result<()> {
     }
     let mut url = url::Url::parse("https://github.com/skygunner/hfdx/issues/new").unwrap();
     url.query_pairs_mut().append_pair("body", &body);
+    Ok(url)
+}
+pub fn issue(s: &AppSnapshot, ui: &str) -> std::io::Result<()> {
+    let url = issue_url(s, ui)?;
     let mut child = Command::new(if cfg!(windows) {
         "explorer"
     } else {
@@ -382,6 +391,48 @@ mod tests {
                 size: 1,
             }],
         }
+    }
+    #[tokio::test]
+    async fn restart_waits_for_work_and_issue_omits_private_fields() {
+        let directory = tempfile::tempdir().unwrap();
+        let settings = crate::storage::load_settings(&crate::SettingsPaths {
+            settings_file: directory.path().join("settings.json"),
+        })
+        .await
+        .unwrap();
+        let mut s = AppSnapshot {
+            revision: 1,
+            phase: UiPhase::Downloading,
+            selection: crate::Selection::new().view(),
+            task: None,
+            settings: std::sync::Arc::new(settings),
+            recent: std::sync::Arc::from([]),
+            error: Some(crate::task::UiError {
+                code: crate::task::ErrorCode::Network,
+                message: "private-model".into(),
+                hint: "private-user".into(),
+                detail: None,
+            }),
+            diagnostics: Default::default(),
+            queue: None,
+        };
+        let mut updates = Updates::new("hfdx");
+        updates.installed = true;
+        assert!(!updates.restart_ready(&s));
+        s.phase = UiPhase::Verifying;
+        assert!(!updates.restart_ready(&s));
+        s.phase = UiPhase::Idle;
+        s.queue = Some(std::sync::Arc::new(crate::task::QueueView {
+            preparing: true,
+            ..Default::default()
+        }));
+        assert!(!updates.restart_ready(&s));
+        s.queue = None;
+        assert!(updates.restart_ready(&s));
+        let url = issue_url(&s, "GUI").unwrap();
+        let body = url.query_pairs().next().unwrap().1;
+        assert!(body.contains("Network"));
+        assert!(!body.contains("private-"));
     }
     #[test]
     fn only_newer_versions_and_matching_platforms_are_offered() {

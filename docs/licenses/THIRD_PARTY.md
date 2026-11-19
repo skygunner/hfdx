@@ -23206,3 +23206,8 @@ bodaay/HuggingFaceModelDownloader, commit
 SPDX-License-Identifier: Apache-2.0. This modified Rust implementation selects exact
 catalog IDs instead of generated download filters. Retain the accompanying
 [Apache-2.0 license](HFMD-APACHE-2.0.txt) when distributing this port.
+
+## Executable updates
+
+hfdx 0.2 adds self-replace 1.5.1 under Apache-2.0.
+[Upstream source](https://github.com/mitsuhiko/self-replace) · [License text](SELF-REPLACE-APACHE-2.0.txt).

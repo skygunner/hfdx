@@ -495,7 +495,10 @@ fn render(frame: &mut ratatui::Frame<'_>, app: &App, snapshot: &AppSnapshot) {
         );
         return;
     }
-    let shortcuts = shortcuts(app, snapshot);
+    let mut shortcuts = shortcuts(app, snapshot);
+    if app.updates.can_install() && !app.settings_open {
+        shortcuts.push_str("\nUpdate available / 发现新版本 · Ctrl+S");
+    }
     let [area, footer] = Layout::vertical([
         Constraint::Min(0),
         Constraint::Length(shortcuts.lines().count() as u16),

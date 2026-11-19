@@ -63,6 +63,8 @@ async fn endpoint_environment_applies_only_without_saved_settings() {
         verify_after_download: true,
         notify_on_completion: true,
         sound_on_completion: false,
+        auto_update_check: false,
+        update_interval: Default::default(),
         debug_logging: false,
         theme: hfdx_core::storage::Theme::System,
         language: None,
