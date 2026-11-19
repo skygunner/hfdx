@@ -131,6 +131,9 @@ pub fn settings(ui: &AppWindow, current: &Settings) -> Result<CoreCommand, Strin
     settings.verify_after_download = ui.get_verify();
     settings.notify_on_completion = ui.get_notify();
     settings.sound_on_completion = ui.get_sound();
+    settings.auto_update_check = ui.get_auto_check();
+    settings.update_interval =
+        hfdx_core::updates::Interval::from_index(ui.get_update_frequency() as usize);
     settings.debug_logging = ui.get_debug();
     settings.theme = theme(ui);
     settings.language = Some(language(ui));

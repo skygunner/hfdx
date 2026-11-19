@@ -2,6 +2,12 @@ import { Button, CheckBox, ComboBox, HorizontalBox, LineEdit, ScrollView, SpinBo
 import { Tokens } from "tokens.slint";
 
 export component SettingsPane inherits VerticalBox {
+    in-out property <bool> auto-check;
+    in-out property <int> update-frequency: 1;
+    in property <string> update-status;
+    in property <bool> can-update;
+    in property <bool> can-restart;
+    callback maintenance(int);
     in-out property <string> endpoint;
     in-out property <string> revision: "main";
     in-out property <string> token;
@@ -40,6 +46,17 @@ export component SettingsPane inherits VerticalBox {
             width: settings-scroll.visible-width;
             padding: Tokens.gap;
             spacing: Tokens.section;
+            VerticalBox {
+                CheckBox { text: @tr("Automatically check for updates"); checked <=> root.auto-check; }
+                ComboBox { model: [@tr("Daily"), @tr("Weekly"), @tr("Monthly (30 days)")]; current-index <=> root.update-frequency; enabled: root.auto-check; }
+                HorizontalBox {
+                    Button { text: @tr("Check for updates"); clicked => { root.maintenance(0); } }
+                    if root.can-update: Button { text: @tr("Update"); clicked => { root.maintenance(1); } }
+                    if root.can-restart: Button { text: @tr("Restart"); clicked => { root.maintenance(3); } }
+                    Button { text: @tr("Draft GitHub issue"); clicked => { root.maintenance(2); } }
+                }
+                Text { text: root.update-status; wrap: word-wrap; }
+            }
             VerticalBox {
                 spacing: Tokens.gap;
                 Text { text: @tr("Download access tokens"); font-size: Tokens.heading; }

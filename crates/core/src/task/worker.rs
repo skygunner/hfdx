@@ -473,6 +473,7 @@ impl Worker {
             error: self.error.clone(),
             queue: None,
             diagnostics: Diagnostics {
+                current_log: self.logger.as_ref().map(|l| l.current_log()),
                 log_directory: self
                     .logger
                     .as_ref()

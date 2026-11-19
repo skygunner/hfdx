@@ -54,6 +54,8 @@ pub fn initialize(ui: &AppWindow, snapshot: &AppSnapshot) {
     ui.set_task_verify(snapshot.settings.verify_after_download);
     ui.set_notify(snapshot.settings.notify_on_completion);
     ui.set_sound(snapshot.settings.sound_on_completion);
+    ui.set_auto_check(snapshot.settings.auto_update_check);
+    ui.set_update_frequency(snapshot.settings.update_interval.index() as i32);
     ui.set_debug(snapshot.settings.debug_logging);
     ui.set_language_index(match snapshot.settings.effective_language() {
         Language::English => 0,

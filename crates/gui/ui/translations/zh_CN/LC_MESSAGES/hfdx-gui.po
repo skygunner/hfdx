@@ -759,3 +759,33 @@ msgstr "保存令牌"
 
 msgid "Saved tokens remain available after restart. Clear a field and save to remove its token."
 msgstr "保存后重启仍可使用。清空输入框并保存即可删除对应令牌。"
+
+msgid "Automatically check for updates"
+msgstr "自动检查更新"
+
+msgid "Daily"
+msgstr "每天"
+
+msgid "Weekly"
+msgstr "每周"
+
+msgid "Monthly (30 days)"
+msgstr "每月（30 天）"
+
+msgid "Check for updates"
+msgstr "检查更新"
+
+msgid "Update"
+msgstr "更新"
+
+msgid "Restart"
+msgstr "重启"
+
+msgid "Draft GitHub issue"
+msgstr "起草 GitHub Issue"
+
+msgid "Later"
+msgstr "稍后"
+
+msgid "Update installed. Restart now?"
+msgstr "更新已安装。是否现在重启？"

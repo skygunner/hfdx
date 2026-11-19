@@ -110,6 +110,7 @@ enum Completion {
 }
 
 struct App {
+    updates: hfdx_core::updates::Updates,
     token_edit: Option<String>,
     fields: [String; 9],
     focus: usize,
@@ -143,6 +144,7 @@ impl App {
     fn new(repo: String, snapshot: &AppSnapshot) -> Self {
         let settings = &snapshot.settings;
         Self {
+            updates: hfdx_core::updates::Updates::new("hfdx"),
             token_edit: None,
             fields: [
                 repo,
@@ -483,6 +485,16 @@ fn render(frame: &mut ratatui::Frame<'_>, app: &App, snapshot: &AppSnapshot) {
         );
         return;
     }
+    if app.updates.restart_ready(snapshot) && !app.updates.later {
+        frame.render_widget(
+            Paragraph::new(
+                "Update installed. Restart now? / 更新已安装，现在重启？ [Y] Yes   [N] Later",
+            )
+            .block(Block::bordered()),
+            area,
+        );
+        return;
+    }
     let shortcuts = shortcuts(app, snapshot);
     let [area, footer] = Layout::vertical([
         Constraint::Min(0),
@@ -502,7 +514,7 @@ fn render(frame: &mut ratatui::Frame<'_>, app: &App, snapshot: &AppSnapshot) {
             &snapshot.settings,
             app.settings_selection,
             &diagnostic,
-            &app.message,
+            &format!("{} {}", app.updates.status, app.message),
             app.token_edit.as_deref(),
         );
         return;
@@ -1019,8 +1031,8 @@ fn handle_key(
         }
         match key.code {
             KeyCode::Esc => app.settings_open = false,
-            KeyCode::Down => app.settings_selection = (app.settings_selection + 1) % 10,
-            KeyCode::Up => app.settings_selection = (app.settings_selection + 9) % 10,
+            KeyCode::Down => app.settings_selection = (app.settings_selection + 1) % 15,
+            KeyCode::Up => app.settings_selection = (app.settings_selection + 14) % 15,
             KeyCode::Enter | KeyCode::Char(' ') if !app.settings_pending => {
                 if matches!(app.settings_selection, 6 | 7) {
                     app.token_edit = Some(
@@ -1225,12 +1237,12 @@ fn handle_key(
 
 pub fn run<B: Backend>(
     terminal: &mut Terminal<B>,
-    _runtime: &tokio::runtime::Runtime,
+    runtime: &tokio::runtime::Runtime,
     session: &CoreSession,
     repo: String,
     task_path: Option<PathBuf>,
     mut diagnostics: tokio::sync::watch::Receiver<Diagnostic>,
-) -> io::Result<()>
+) -> io::Result<Option<PathBuf>>
 where
     io::Error: From<B::Error>,
 {
@@ -1299,6 +1311,7 @@ where
             }
         }
         let snapshot = session.snapshots.borrow().clone();
+        app.updates.tick(&snapshot.settings, runtime.handle());
         terminal.draw(|frame| render(frame, &app, &snapshot))?;
         if !event::poll(Duration::from_millis(150))? {
             continue;
@@ -1306,7 +1319,9 @@ where
         let key = match event::read()? {
             Event::Key(key) => key,
             Event::Paste(text) => {
-                paste(&mut app, session, &snapshot, &text);
+                if !app.updates.restart_ready(&snapshot) || app.updates.later {
+                    paste(&mut app, session, &snapshot, &text);
+                }
                 continue;
             }
             _ => continue,
@@ -1317,8 +1332,34 @@ where
         if key.code == KeyCode::Char('c') && key.modifiers.contains(KeyModifiers::CONTROL) {
             break;
         }
+        if app.updates.restart_ready(&snapshot) && !app.updates.later {
+            match key.code {
+                KeyCode::Char('y' | 'Y') => return Ok(app.updates.executable.clone()),
+                KeyCode::Char('n' | 'N') | KeyCode::Esc => app.updates.later = true,
+                _ => {}
+            }
+            continue;
+        }
+        if app.settings_open
+            && app.token_edit.is_none()
+            && matches!(key.code, KeyCode::Enter | KeyCode::Char(' '))
+            && app.settings_selection >= 12
+        {
+            match app.settings_selection {
+                12 => app.updates.check(runtime.handle()),
+                13 if app.updates.restart_ready(&snapshot) => app.updates.later = false,
+                13 => app.updates.install(runtime.handle()),
+                14 => {
+                    if let Err(e) = hfdx_core::updates::issue(&snapshot, "TUI") {
+                        app.message = e.to_string();
+                    }
+                }
+                _ => {}
+            }
+            continue;
+        }
         app.message_error = None;
         handle_key(&mut app, session, &snapshot, key, terminal.size()?.height);
     }
-    Ok(())
+    Ok(None)
 }

@@ -217,6 +217,10 @@ fn enabled_by_default() -> bool {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Settings {
+    #[serde(default)]
+    pub auto_update_check: bool,
+    #[serde(default)]
+    pub update_interval: crate::updates::Interval,
     #[serde(
         default,
         serialize_with = "serialize_saved_token",
@@ -343,6 +347,8 @@ fn defaults() -> Result<Settings, StorageError> {
         }
     };
     Ok(Settings {
+        auto_update_check: false,
+        update_interval: Default::default(),
         hf_token: None,
         modelscope_token: None,
         endpoint: Endpoint::parse(&endpoint, false).map_err(|_| {

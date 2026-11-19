@@ -11,6 +11,14 @@ export struct ConflictRow { path: string, local: string, remote: string }
 export struct RecentRow { path: string, status: string }
 
 export component AppWindow inherits Window {
+    in-out property <bool> auto-check;
+    in-out property <int> update-frequency: 1;
+    in property <string> update-status;
+    in property <bool> can-update;
+    in property <bool> can-restart;
+    callback maintenance(int);
+    in-out property <bool> restart-prompt;
+    callback restart-choice(bool);
     title: "HFDX";
     preferred-width: 1040px;
     preferred-height: 760px;
@@ -566,6 +574,12 @@ export component AppWindow inherits Window {
                 }
                 if root.settings-open: SettingsPane {
                     vertical-stretch: 1;
+                    auto-check <=> root.auto-check;
+                    update-frequency <=> root.update-frequency;
+                    update-status: root.update-status;
+                    can-update: root.can-update;
+                    can-restart: root.can-restart;
+                    maintenance(i) => { root.maintenance(i); }
                     endpoint <=> root.endpoint;
                     revision <=> root.revision;
                     token <=> root.token;
@@ -709,6 +723,21 @@ export component AppWindow inherits Window {
                     spacing: Tokens.gap;
                     options-close := Button { height: Tokens.control; vertical-stretch: 0; text: @tr("Close"); clicked => { root.options-open = false; } }
                     Button { height: Tokens.control; vertical-stretch: 0; text: @tr("Open settings"); clicked => { root.options-open = false; root.settings-open = true; } }
+                }
+            }
+        }
+    }
+    if root.restart-prompt: Rectangle {
+        background: #0008;
+        TouchArea {}
+        Rectangle {
+            width: min(440px, parent.width); height: 140px; background: Palette.background;
+            VerticalBox {
+                padding: 16px;
+                Text { text: @tr("Update installed. Restart now?"); wrap: word-wrap; }
+                HorizontalBox {
+                    Button { text: @tr("Later"); clicked => { root.restart-choice(false); } }
+                    Button { text: @tr("Restart"); clicked => { root.restart-choice(true); } }
                 }
             }
         }

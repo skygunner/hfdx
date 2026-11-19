@@ -83,14 +83,88 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     if let Some(path) = task_file {
         bridge.submit(CoreCommand::OpenTask(path));
     }
+    let updates = std::rc::Rc::new(std::cell::RefCell::new(hfdx_core::updates::Updates::new(
+        "hfdx-gui",
+    )));
+    let restart = std::rc::Rc::new(std::cell::Cell::new(false));
+    let timer = slint::Timer::default();
+    {
+        let u = updates.clone();
+        let b = bridge.clone();
+        let weak = ui.as_weak();
+        timer.start(
+            slint::TimerMode::Repeated,
+            std::time::Duration::from_millis(500),
+            move || {
+                let Some(ui) = weak.upgrade() else { return };
+                let snapshot = b.mailbox.lock().unwrap().snapshot.clone();
+                let mut u = u.borrow_mut();
+                u.tick(&snapshot.settings, &b.runtime);
+                ui.set_update_status(u.status.as_str().into());
+                ui.set_can_update(u.can_install());
+                ui.set_can_restart(u.restart_ready(&snapshot));
+                ui.set_restart_prompt(u.restart_ready(&snapshot) && !u.later);
+            },
+        );
+    }
+    {
+        let u = updates.clone();
+        let b = bridge.clone();
+        ui.on_maintenance(move |i| {
+            let snapshot = b.mailbox.lock().unwrap().snapshot.clone();
+            let mut u = u.borrow_mut();
+            match i {
+                0 => u.check(&b.runtime),
+                1 => u.install(&b.runtime),
+                2 => {
+                    if let Err(e) = hfdx_core::updates::issue(&snapshot, "GUI") {
+                        b.show_error(&e.to_string())
+                    }
+                }
+                3 => u.later = false,
+                _ => {}
+            }
+        });
+    }
+    {
+        let u = updates.clone();
+        let b = bridge.clone();
+        let restart = restart.clone();
+        let weak = ui.as_weak();
+        ui.on_restart_choice(move |yes| {
+            u.borrow_mut().later = true;
+            if let Some(ui) = weak.upgrade() {
+                ui.set_restart_prompt(false);
+            }
+            if yes
+                && u.borrow()
+                    .restart_ready(&b.mailbox.lock().unwrap().snapshot)
+            {
+                restart.set(true);
+                let _ = slint::quit_event_loop();
+            }
+        });
+    }
     let result = ui.run();
+    timer.stop();
     if bridge.handle.request_shutdown().is_err() {
         eprintln!("Core already closed");
     }
     let joined = worker.join();
     result?;
     match joined {
-        Ok(Ok(())) => Ok(()),
+        Ok(Ok(())) => {
+            if restart.get() {
+                hfdx_core::updates::restart(
+                    updates
+                        .borrow()
+                        .executable
+                        .as_deref()
+                        .ok_or("Missing executable")?,
+                )?;
+            }
+            Ok(())
+        }
         Ok(Err(error)) => Err(error.into()),
         Err(_) => Err("Core background thread panicked".into()),
     }

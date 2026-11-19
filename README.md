@@ -4,19 +4,25 @@ hfdx 是用 Rust 编写的 Hugging Face 和 ModelScope 下载器。桌面用户�
 
 ## 下载与安装
 
-从 [GitHub Releases](https://github.com/skygunner/hfdx/releases/latest) 下载 Linux x86_64 压缩包和同一版本的 SHA256SUMS。包内有桌面程序 `hfdx-gui`、终端程序 `hfdx` 和许可说明。下载引擎需要单独安装，推荐 aria2 1.37 或更新版本。GUI 需要图形桌面。此版本的预编译 GUI 需要 glibc 2.43 或更新版本，TUI 需要 glibc 2.39 或更新版本；较旧的发行版可使用下方源码构建步骤。
+从 [GitHub Releases](https://github.com/skygunner/hfdx/releases/latest) 下载对应平台的软件包及 SHA256SUMS。包内含桌面程序和终端程序；Release 中同名平台的独立可执行文件也供内置更新器使用。
 
-在 Debian / Ubuntu 上可用 `sudo apt install aria2` 安装下载引擎，Arch Linux 使用 `sudo pacman -S aria2`。在下载目录执行：
+| 平台 | 下载包 |
+| --- | --- |
+| Linux x86_64 | hfdx-linux-x86_64.tar.gz |
+| Linux ARM64（aarch64） | hfdx-linux-aarch64.tar.gz |
+| Windows x64 | hfdx-windows-x86_64.zip |
+
+在 Linux 上安装 aria2（Debian/Ubuntu 使用 `sudo apt install aria2`），选择架构后执行：
 
 ```sh
-sha256sum -c SHA256SUMS &&
-tar -xzf hfdx-linux-x86_64.tar.gz &&
+package=hfdx-linux-$(uname -m)
+sha256sum --ignore-missing -c SHA256SUMS &&
+tar -xzf "$package.tar.gz" &&
 mkdir -p ~/.local/bin &&
-install -m 755 hfdx-linux-x86_64/hfdx hfdx-linux-x86_64/hfdx-gui ~/.local/bin/
-~/.local/bin/hfdx-gui --help
+install -m 755 "$package/hfdx" "$package/hfdx-gui" ~/.local/bin/
 ```
 
-启动桌面界面用 `~/.local/bin/hfdx-gui`，终端界面用 `~/.local/bin/hfdx`。如果系统缺少动态库，可用 `ldd ~/.local/bin/hfdx-gui` 查看。
+桌面启动 `~/.local/bin/hfdx-gui`，终端运行 `~/.local/bin/hfdx`。Windows 用户用 PowerShell 的 `Get-FileHash -Algorithm SHA256` 核对 ZIP 摘要后解压到用户可写目录，安装 aria2 并将 aria2c.exe 加入 PATH，然后双击 hfdx-gui.exe 或在终端运行 hfdx.exe。GUI 需要图形桌面；遇到系统运行库不兼容可按下文从源码构建。
 
 ### 复制给 Agent 的一键安装提示词
 
@@ -37,6 +43,14 @@ TUI 用 Tab 切换输入位置，用终端粘贴快捷键输入。F3 加载文�
 - 默认按上游提供的摘要校验，例如 LFS SHA-256 或 Git blob SHA-1。缺少支持的摘要会显示“未校验”。同名文件可先核对摘要，内容冲突时再决定如何处理。
 - 匿名下载受平台配额和限流影响，批量或大型下载建议先保存对应平台的只读令牌。受限仓库还需要账户获准访问。临时端点令牌优先于已保存的令牌；清空临时值即可恢复平台凭据。令牌保存在本机配置文件中，Linux 默认位置是 `~/.config/hfdx/settings.json`。分享日志或反馈时请勿附上该文件。
 - 下载和校验共用并发额度。机械硬盘上同时读写多个大分片可能拖慢速度，可调低并发文件数；开始前请按预览大小预留空间，替换已有文件时还需要暂存空间。
+
+## 检查更新与反馈
+
+GUI 和 TUI 的设置均支持手动检查 GitHub 正式版。自动检查默认关闭，可选每天、每周或每 30 天；GUI 修改后点击保存。发现新版后选择“更新”，程序按当前平台与界面下载可执行文件，核对 GitHub 发布的 SHA-256 后替换。GUI 和 TUI 可分别更新。安装目录需要当前用户有写权限。正在下载、校验或准备任务时可继续工作；队列空闲后才会询问是否重启。选择“稍后”可在设置中再次请求重启。
+
+选择“起草 GitHub Issue”会打开浏览器，将程序版本、平台、错误类别、状态码和最近的日志计数预填到草稿。用户可修改并决定是否提交。草稿省略账户、令牌、原始日志、时间戳、仓库名、本地路径和任务标识。也可直接[提交 Issue](https://github.com/skygunner/hfdx/issues/new) 或通过 fork 提交 PR。
+
+功能发布递增次版本号（例如 0.1.0 → 0.2.0）；仅修复问题的发布递增补丁版本号（例如 0.2.0 → 0.2.1）。
 
 ## 从源码构建
 

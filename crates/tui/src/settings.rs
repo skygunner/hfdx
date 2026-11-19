@@ -30,6 +30,11 @@ pub fn change(settings: &mut Settings, selected: usize) {
         3 => settings.notify_on_completion = !settings.notify_on_completion,
         4 => settings.sound_on_completion = !settings.sound_on_completion,
         5 => settings.debug_logging = !settings.debug_logging,
+        10 => settings.auto_update_check = !settings.auto_update_check,
+        11 => {
+            settings.update_interval =
+                hfdx_core::updates::Interval::from_index((settings.update_interval.index() + 1) % 3)
+        }
         _ => {}
     }
 }
@@ -133,15 +138,38 @@ pub fn render(
             if selected == index + 8 { ">" } else { " " }
         ));
     }
+    for (i, label) in [
+        format!(
+            "Auto-check / 自动检查更新: {}",
+            toggle(settings.auto_update_check)
+        ),
+        format!(
+            "Frequency / 频率: {}",
+            ["Daily / 每天", "Weekly / 每周", "Monthly / 30天"][settings.update_interval.index()]
+        ),
+        "Check for updates / 检查更新".into(),
+        "Update or restart / 更新或重启".into(),
+        "Draft GitHub issue / 起草问题反馈".into(),
+    ]
+    .iter()
+    .enumerate()
+    {
+        lines.push_str(&format!(
+            "{} {label}\n",
+            if selected == i + 10 { ">" } else { " " }
+        ));
+    }
+    if !message.is_empty() {
+        lines.push_str(message);
+        lines.push('\n');
+    }
     lines.push_str(&format!(
         "\n{}: {}\n\n{}",
         t(Message::LogDirectory),
         diagnostic,
         t(Message::TokenHelp)
     ));
-    if !message.is_empty() {
-        lines.push_str(&format!("\n{message}"));
-    }
+
     frame.render_widget(Clear, area);
     frame.render_widget(
         Paragraph::new(lines)

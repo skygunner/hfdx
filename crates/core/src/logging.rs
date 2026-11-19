@@ -268,6 +268,11 @@ impl SessionLogger {
         logger.retain_closed()?;
         Ok(logger)
     }
+    pub fn current_log(&self) -> PathBuf {
+        self.directory()
+            .join(format!("hfdx-session-{}", self.session))
+            .join("events_rCURRENT.log")
+    }
     pub fn directory(&self) -> &Path {
         &self.config.directory
     }

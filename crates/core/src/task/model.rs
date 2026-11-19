@@ -362,6 +362,7 @@ pub struct TaskView {
 }
 #[derive(Clone, Debug, Default)]
 pub struct Diagnostics {
+    pub current_log: Option<PathBuf>,
     pub log_directory: Option<PathBuf>,
     pub logging: Option<crate::logging::LogStatus>,
 }

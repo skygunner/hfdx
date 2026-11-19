@@ -1,0 +1,33 @@
+name: Build release executables
+on: workflow_dispatch
+permissions:
+  contents: read
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: windows-2022
+            platform: windows
+            suffix: .exe
+          - runner: ubuntu-24.04
+            platform: linux
+            suffix: ''
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+      - run: cargo build --release --locked -p hfdx-tui -p hfdx-gui
+      - name: Test update policy and smoke test both executables
+        shell: bash
+        run: |
+          cargo test --release --locked -p hfdx-core --lib updates::tests
+          mkdir assets
+          for program in hfdx hfdx-gui; do
+            ./target/release/"$program"${{ matrix.suffix }} --version
+            cp target/release/"$program"${{ matrix.suffix }} assets/"$program"-${{ matrix.platform }}-x86_64${{ matrix.suffix }}
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.platform }}-x86_64
+          path: assets/

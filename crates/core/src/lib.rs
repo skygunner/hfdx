@@ -29,4 +29,5 @@ pub use storage::{
 
 pub mod profiles;
 
+pub mod updates;
 pub mod version;

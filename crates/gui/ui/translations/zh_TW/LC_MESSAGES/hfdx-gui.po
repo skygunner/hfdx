@@ -759,3 +759,33 @@ msgstr "儲存權杖"
 
 msgid "Saved tokens remain available after restart. Clear a field and save to remove its token."
 msgstr "儲存後重新啟動仍可使用。清空輸入欄並儲存即可移除對應權杖。"
+
+msgid "Automatically check for updates"
+msgstr "自動檢查更新"
+
+msgid "Daily"
+msgstr "每天"
+
+msgid "Weekly"
+msgstr "每週"
+
+msgid "Monthly (30 days)"
+msgstr "每月（30 天）"
+
+msgid "Check for updates"
+msgstr "檢查更新"
+
+msgid "Update"
+msgstr "更新"
+
+msgid "Restart"
+msgstr "重新啟動"
+
+msgid "Draft GitHub issue"
+msgstr "草擬 GitHub Issue"
+
+msgid "Later"
+msgstr "稍後"
+
+msgid "Update installed. Restart now?"
+msgstr "更新已安裝。是否立即重新啟動？"

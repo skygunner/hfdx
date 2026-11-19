@@ -126,6 +126,7 @@ async fn spawn_worker(
         recent: Arc::from(recent),
         error: None,
         diagnostics: Diagnostics {
+            current_log: logger.as_ref().map(|l| l.current_log()),
             log_directory: logger
                 .as_ref()
                 .map(|logger| logger.directory().to_path_buf()),

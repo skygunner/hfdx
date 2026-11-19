@@ -248,8 +248,11 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
             .render(final_settings.borrow().settings.effective_language())
         );
     }
-    result?;
+    let restart = result?;
     joined?;
     notification_joined?;
+    if let Some(path) = restart {
+        hfdx_core::updates::restart(&path)?;
+    }
     Ok(())
 }

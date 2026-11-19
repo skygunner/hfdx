@@ -1981,7 +1981,7 @@ checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
 
 [[package]]
 name = "hfdx-core"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "dirs",
  "flexi_logger",
@@ -1990,6 +1990,8 @@ dependencies = [
  "httpdate",
  "rand 0.9.5",
  "reqwest",
+ "self-replace",
+ "semver",
  "serde",
  "serde_json",
  "sha1",
@@ -2005,7 +2007,7 @@ dependencies = [
 
 [[package]]
 name = "hfdx-gui"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "hfdx-core",
  "rfd",
@@ -2018,7 +2020,7 @@ dependencies = [
 
 [[package]]
 name = "hfdx-tui"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "crossterm",
  "hfdx-core",
@@ -4841,6 +4843,17 @@ dependencies = [
  "memmap2",
  "smithay-client-toolkit",
  "tiny-skia 0.11.4",
+]
+
+[[package]]
+name = "self-replace"
+version = "1.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "609c5606d9d357b26e4ee1a7a01beac396628d0fa01ebbade2a09cefb88e65af"
+dependencies = [
+ "fastrand",
+ "tempfile",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
